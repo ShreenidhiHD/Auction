@@ -29,10 +29,10 @@ const DashboardPage = () => {
                 <NotificationsIcon />
               </Badge>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                My Donations
+                My Listings
               </Typography>
               <Typography sx={{ mb: 2 }}>
-                Manage and view extra food donations.
+                Manage and view your listings.
               </Typography>
               <Button
                 component={Link}
@@ -64,7 +64,7 @@ const DashboardPage = () => {
                 My Purchases
               </Typography>
               <Typography sx={{ mb: 2 }}>
-                View the food items you have purchased.
+                View the items you have purchased.
               </Typography>
               <Button
                 component={Link}
@@ -93,10 +93,10 @@ const DashboardPage = () => {
                 <NotificationsIcon />
               </Badge>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                My Requests
+                My Bid History
               </Typography>
               <Typography sx={{ mb: 2 }}>
-                Manage and view your food requests.
+                Manage and view your Bid History.
               </Typography>
               <Button
                 component={Link}

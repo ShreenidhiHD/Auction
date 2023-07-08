@@ -10,7 +10,7 @@ import Login from './pages/Login';
 import UserHome from './pages/User/UserHome';
 import UserProfile from './pages/User/UserProfile';
 // import CompleteProfile from './pages/User/CompleteProfile';
-import DonateFood from './pages/User/DonateFood';
+import ListItem from './pages/User/ListItem';
 import Dashboard from './pages/User/Dashboard';
 import SettingsProvider from './server/SettingsProvider';
 import UserDonations from './pages/User/UserDonations';
@@ -34,7 +34,7 @@ function App() {
             <Route path="/userhome" element={<AuthenticatedRoute><UserHome /></AuthenticatedRoute>} />
             <Route path="/userprofile" element={<AuthenticatedRoute><UserProfile /></AuthenticatedRoute>} />
             {/* <Route path="/completeprofile" element={<AuthenticatedRoute><CompleteProfile /></AuthenticatedRoute>} /> */}
-            <Route path="/donatefood" element={<AuthenticatedRoute><DonateFood /></AuthenticatedRoute>} />
+            <Route path="/listitem" element={<AuthenticatedRoute><ListItem /></AuthenticatedRoute>} />
             <Route path="/dashboard" element={<AuthenticatedRoute><Dashboard /></AuthenticatedRoute>} />
             <Route path="/userdonations" element={<AuthenticatedRoute><UserDonations /></AuthenticatedRoute>} />
           </Routes>

@@ -13,7 +13,7 @@ const ContactUs = () => {
   };
 
   return (
-    <Container  style={{ marginTop: '40px', marginBottom: '40px' }}>
+    <Container maxWidth="md" style={{ marginTop: '40px', marginBottom: '40px',maxWidth: '100%',}}>
       <Card style={{ backgroundColor: '#f9f9f9' }}>
         <CardContent>
           <Grid container spacing={2}>
@@ -47,14 +47,14 @@ const ContactUs = () => {
                   variant="outlined"
                   fullWidth
                   style={{ marginBottom: '16px' }}
-                  // Add necessary input props and state handling
+                  
                 />
                 <TextField
                   label="Email"
                   variant="outlined"
                   fullWidth
                   style={{ marginBottom: '16px' }}
-                  // Add necessary input props and state handling
+                 
                 />
                 <TextField
                   label="Subject"
@@ -62,7 +62,7 @@ const ContactUs = () => {
                   fullWidth
                   style={{ marginBottom: '16px' }}
                   name="subject"
-                  // Add necessary input props and state handling
+                 
                 />
                 <TextField
                   label="Message"
@@ -72,7 +72,7 @@ const ContactUs = () => {
                   fullWidth
                   style={{ marginBottom: '16px' }}
                   name="message"
-                  // Add necessary input props and state handling
+                  
                 />
                 <Button
                   variant="contained"

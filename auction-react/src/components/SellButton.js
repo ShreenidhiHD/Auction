@@ -2,18 +2,18 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
-const DonateButton = () => {
+const SellButton = () => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/donatefood");
+        navigate("/listitem");
     }
 
     return (
         <Button  color="inherit"  onClick={handleClick}>
-            Donate
+            Sell
         </Button>
     );
 }
 
-export default DonateButton;
+export default SellButton;

@@ -7,6 +7,7 @@ import { SettingsContext } from '../server/SettingsProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/Home.css';
 import BrowseMore from '../components/BrowseMore';
+import ContactUs from '../components/Contactus';
 
 // The Home component is the main landing page of the application. 
 // It displays a Carousel at the top, followed by three Card components in a grid.
@@ -24,8 +25,8 @@ const Home = () => {
       <Carousel />
       <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <>
-          <h3 className="section_title_cards">Transforming Food Waste: Donate or Trade for a Purposeful Cause</h3>
-          <h6 className="section_text_cards" style={{ marginBottom: '50px' }}>Food Donations: Share the Blessings, Feed the Hungry</h6>
+          <h3 className="section_title_cards">Bid, Buy, and Sell: Explore a World of Possibilities at our Auction Platform.</h3>
+          <h6 className="section_text_cards" style={{ marginBottom: '50px' }}> Find Unique Items to Buy or Sell in our Vibrant Auction Community</h6>
           <Grid container spacing={2} justifyContent="center">
             <Grid item>
               <Card />
@@ -39,6 +40,7 @@ const Home = () => {
           </Grid>
         </>
         <BrowseMore/>
+        <ContactUs/>
       </Container>
       <Footer />
     </div>

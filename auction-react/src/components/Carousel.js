@@ -4,15 +4,15 @@ import '../css/Carousel.css';
 
 function CarouselComponent() {
   const images = [
-    'https://img.freepik.com/free-photo/medium-shot-people-with-food-donations_23-2149182009.jpg?w=1060&t=st=1687456488~exp=1687457088~hmac=b151645424dbfd6c0c8386cab6760e0ec5e66cf2a1a0b5240dcfe34a264effa3',
-   'https://img.freepik.com/free-photo/team-volunteers-holding-donation-boxes-looking-camera_637285-10775.jpg?w=1060&t=st=1687456628~exp=1687457228~hmac=372820c1da5f6bf839f59203de253da17d791d055e45d1ee2b0a1dc1989cbacb',
-    'https://img.freepik.com/free-photo/people-collecting-food-donations-medium-shot_23-2149182020.jpg?w=1060&t=st=1687456675~exp=1687457275~hmac=bde205a3b4b1a07bb54f5cc294c6197c0dfb1ec4dbfd75d722e4b6c13d89773b',
+    'https://img.freepik.com/free-vector/bid-design-background_52683-76080.jpg?w=1380&t=st=1688840866~exp=1688841466~hmac=5ac6a60fed43fdf485833b992b1f468cf16ed02e445a91c9f27b5229254b2be6',
+   'https://img.freepik.com/free-photo/court-hammer_1048-4190.jpg?w=826&t=st=1688840975~exp=1688841575~hmac=0f3c0d9d268f86f83b2cdbbaa86a469a7094feac84c53b42932b678ec47f5250',
+    'https://img.freepik.com/free-vector/bidding-auction-auctions-involving-purchase-item_1150-35041.jpg?w=1380&t=st=1688841014~exp=1688841614~hmac=80f97c6138d7e6ba5db3938b1971e2b4dacaa08957c19d83e758ded188b87e78',
   ];
 
   return (
     <Carousel interval={3000}> {/* Change slides every 3 seconds */}
       {images.map((image, index) => (
-        <Carousel.Item key={index}>
+        <Carousel.Item key={index} >
           <img className="d-block w-100 carousel-image" src={image} alt={`Image ${index + 1}`} />
         </Carousel.Item>
       ))}

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { format } from 'date-fns';
 
-function DonateFood() {
+function ListItem() {
     
     const navigate = useNavigate();
     
@@ -88,7 +88,7 @@ function DonateFood() {
     }
   return (
     <div style={{ marginTop: '20px', padding: '30px' }}>
-      <h1 className='text-center'>Add Food details here</h1>
+      <h1 className='text-center'>Add Item details here</h1>
       <Card>
       {message && (
         <Alert severity={messageType}>
@@ -169,4 +169,4 @@ function DonateFood() {
   );
 }
 
-export default DonateFood;
+export default ListItem;
