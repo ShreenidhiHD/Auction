@@ -30,6 +30,16 @@ Route::middleware('auth:sanctum')->get('/user/profile', [UserController::class, 
 Route::middleware('auth:sanctum')->put('/user/profile', [UserController::class, 'updateProfile']);
 Route::middleware('auth:sanctum')->put('/user/change-password', [UserController::class, 'changePassword']);
 Route::get('/user/is-profile-complete', [UserController::class, 'isProfileComplete'])->middleware('auth:sanctum');
+
 // Route to fetch application settings
 Route::get('/settings', [SettingsController::class, 'getSettings']);
 Route::post('/reset-password', [UserController::class, 'resetPassword']);
+
+//Auction routes
+Route::middleware('auth:sanctum')->post('/create_auction',[AuctionController::class, 'create']);
+Route::middleware('auth:sanctum')->get('/show_auction',[AuctionController::class, 'read']);
+Route::middleware('auth:sanctum')->post('/update_auction',[AuctionController::class, 'update']);
+Route::middleware('auth:sanctum')->get('/delete_auction/{id}',[AuctionController::class, 'delete']);
+Route::middleware('auth:sanctum')->get('/show_auction_by_id/{id}',[AuctionController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->post('/announce_winner',[AuctionController::class, 'update_winner']);
+Route::middleware('auth:sanctum')->post('/update_delivery_status',[AuctionController::class, 'update_delivery_status']);
