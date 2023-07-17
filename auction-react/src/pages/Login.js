@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react'; // Don't forget to import useState!
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,10 +13,8 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-
-
-async function loginUser(email, password) {
+import Alert from '@mui/material/Alert';
+async function loginUser(email, password, setLoginError, setErrorMessage) {
   try {
     const response = await fetch('http://localhost:8000/api/login', {
       method: 'POST',
@@ -27,49 +26,56 @@ async function loginUser(email, password) {
         password
       }),
     });
+    
+const data = await response.json();
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+      throw new Error(data.error || `HTTP error! status: ${response.status}`);
+  }
+    
     const token = data.token;
     localStorage.setItem('authToken', token);
     if (response.status === 201) {
       console.log(`User logged in`);
-       // Redirect to userhome.js
-       window.location.href = 'UserHome';
+      // Redirect to userhome.js
+      window.location.href = 'UserHome';
     }
     
   } catch (error) {
+    let message = 'Login failed. Please try again later.';
+    if (error.response && error.response.data && error.response.data.message) {
+        message = error.response.data.message;
+    } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+        message = 'Failed: No response from server';
+    } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+        message = 'Failed: ' + error.message;
+    }
     console.error('Error during login:', error);
-  }
-}
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
+    setErrorMessage(message);
+    setLoginError(true);
+    setTimeout(() => {
+      setLoginError(false);
+      setErrorMessage(''); // clear the error message after 5 seconds
+    }, 5000); // Remove error message after 5 seconds
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
 
-const defaultTheme = createTheme();
+}
 
 export default function SignInSide() {
+  const [loginError, setLoginError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // add errorMessage state here
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    loginUser(data.get('email'), data.get('password'));
+    loginUser(data.get('email'), data.get('password'), setLoginError, setErrorMessage);  // pass setErrorMessage here
   };
-
   return (
-    <ThemeProvider theme={defaultTheme}>
-     
+    <ThemeProvider theme={createTheme()}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -102,6 +108,12 @@ export default function SignInSide() {
             <Typography component="h1" variant="h5">
               Log in
             </Typography>
+            {loginError && (
+              <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+                  {errorMessage}
+              </Alert>
+          )}
+
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
@@ -137,7 +149,7 @@ export default function SignInSide() {
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2">
+                  <Link href="/ForgetPassword" variant="body2">
                     Forgot password?
                   </Link>
                 </Grid>
@@ -147,7 +159,6 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
               </Grid>
-              <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>

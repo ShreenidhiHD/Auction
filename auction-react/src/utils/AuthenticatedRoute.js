@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-function AuthenticatedRoute({ children }) {
+function AuthenticatedRoute({ children, skipProfileCheck = false }) {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('authToken'));
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const validateToken = async () => {
@@ -25,18 +27,45 @@ function AuthenticatedRoute({ children }) {
       }
     };
 
-    // Check validation when component mounts
-    validateToken();
+    const checkProfileCompletion = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/user/is-profile-complete', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
 
-    // Set up interval to validate every minute
-    const interval = setInterval(validateToken, 60000); // 60000 milliseconds = 1 minute
+        setIsProfileComplete(response.data.isComplete);
+      } catch (error) {
+        console.error('Error checking profile completion:', error);
+      }
+    };
 
-    // Clean up the interval when the component unmounts
+    const fetchData = async () => {
+      await validateToken();
+      if (isLoggedIn && !skipProfileCheck) {
+        await checkProfileCompletion();
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 10000);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoggedIn, skipProfileCheck]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (!isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} />;
+  }
+
+  if (!isProfileComplete && !skipProfileCheck) {
+    return <Navigate to="/completeprofile" state={{ from: location }} />;
   }
 
   return children;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,14 +12,41 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Alert from '@mui/material/Alert';
 
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [agreed, setAgreed] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const termsAndConditionsLink = 'https://example.com/terms';
+
+  useEffect(() => {
+    let timer;
+    if (error || passwordError) {
+      timer = setTimeout(() => {
+        setError('');
+        setPasswordError('');
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [error, passwordError]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!agreed) {
+      setError('Please agree to the terms and conditions.');
+      return;
+    }
+
+    if (!name || !email || !password) {
+      setError('All fields are mandatory.');
+      return;
+    }
 
     const userData = {
       name,
@@ -38,18 +65,23 @@ function Signup() {
 
       if (response.ok) {
         // Signup successful
-        const data = await response.json();
-        console.log('Signup successful!', data);
+        setSuccess(true);
         // Handle success, e.g., display a success message
       } else {
         // Signup failed
         const errorData = await response.json();
         console.log('Signup failed', errorData);
-        // Handle failure, e.g., display an error message
+        if (errorData.message && errorData.message.email) {
+          setError('The email has already been taken.');
+        } else if (errorData.message && errorData.message.password) {
+          setPasswordError('The password must be at least 8 characters.');
+        } else {
+          setError('Signup failed. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Error:', error);
-      // Handle error, e.g., display an error message
+      setError('Signup failed. Please try again.');
     }
   };
 
@@ -90,6 +122,21 @@ function Signup() {
               Sign up
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              {success && (
+                <Alert severity="success" sx={{ mb: 2, width: '100%' }}>
+                  Signup successful! Click <Link href="/Login">here</Link> to login.
+                </Alert>
+              )}
+              {error && (
+                <Alert severity="error" sx={{ mb: 2, width: '100%' }}>
+                  {error}
+                </Alert>
+              )}
+              {passwordError && (
+                <Alert severity="error" sx={{ mb: 2, width: '100%' }}>
+                  {passwordError}
+                </Alert>
+              )}
               <TextField
                 margin="normal"
                 required
@@ -126,8 +173,23 @@ function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <FormControlLabel
-                control={<Checkbox value="agree" color="primary" />}
-                label="I agree to the terms and conditions"
+                control={
+                  <Checkbox
+                    value="agree"
+                    color="primary"
+                    required
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                  />
+                }
+                label={
+                  <>
+                    I agree to the{' '}
+                    <Link href={termsAndConditionsLink} target="_blank">
+                      terms and conditions
+                    </Link>
+                  </>
+                }
               />
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                 Sign Up

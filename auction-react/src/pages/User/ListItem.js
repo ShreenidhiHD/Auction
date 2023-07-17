@@ -1,14 +1,10 @@
 import { Grid, Card, CardContent, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { format } from 'date-fns';
 
 function ListItem() {
-    
-    const navigate = useNavigate();
-    
     const [numberOfPlates, setNumberOfPlates] = useState('');
     const [location, setLocation] = useState('');
     const [deliveryStatus, setDeliveryStatus] = useState('');
@@ -19,6 +15,10 @@ function ListItem() {
     const [description, setDescription] = useState('');
     const [preparedDate, setPreparedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [status, setStatus] = useState('active');
+    const [city, setCity] = useState('');
+    const [country, setCountry] = useState('');
+    const [state, setState] = useState('');
+    const [pincode, setPincode] = useState('');
     const [message, setMessage] = useState(null);
     const [messageType, setMessageType] = useState('success');
 
@@ -33,7 +33,7 @@ function ListItem() {
           }
           
           const foodData = {
-            number_of_plates: numberOfPlates,
+            number_of_plates: parseInt(numberOfPlates),
             location,
             delivery_status: deliveryStatus,
             price,
@@ -43,8 +43,12 @@ function ListItem() {
             description,
             prepared_date: preparedDate,
             status,
+            country: country,
+            state: state,
+            city: city,
+            pincode: pincode,
           };
-          
+          console.log(foodData);
           const response = await axios.post('http://localhost:8000/api/addfood', foodData, {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -57,8 +61,12 @@ function ListItem() {
               setMessage('');
               setMessageType('');
             }, 3000);
+            
           if (response.status === 200) {
             console.log("success", response);
+            const form = document.getElementById('donatefood');
+            form.reset();
+           
           } else {
             setMessage(response.data.message);
           setMessageType('error');
@@ -88,7 +96,7 @@ function ListItem() {
     }
   return (
     <div style={{ marginTop: '20px', padding: '30px' }}>
-      <h1 className='text-center'>Add Item details here</h1>
+      <h1 className='text-center'>Add Food details here</h1>
       <Card>
       {message && (
         <Alert severity={messageType}>
@@ -97,10 +105,10 @@ function ListItem() {
       )}
         <CardContent>
         
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} id="donatefood">
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Number of Plates" name="numberOfPlates" type="number" variant="outlined" value={numberOfPlates} onChange={(e) => setNumberOfPlates(e.target.value)} required />
+                <TextField fullWidth label="Number of Plates" name="numberOfPlates" type="number" id="numberofplates" variant="outlined"  onChange={(e) => setNumberOfPlates(e.target.value)} required />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField fullWidth label="Location" name="location" variant="outlined" onChange={(e) => setLocation(e.target.value)} required />
@@ -154,12 +162,24 @@ function ListItem() {
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={4}>
+                <TextField fullWidth label="Country" name="country" variant="outlined" onChange={(e) => setCountry(e.target.value)}   required />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField fullWidth label="State" name="state" variant="outlined" onChange={(e) => setState(e.target.value)}   required />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField fullWidth label="City" name="city" variant="outlined" onChange={(e) => setCity(e.target.value)}   required />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField fullWidth label="Pincode" name="pincode" type="number" variant="outlined" onChange={(e) => setPincode(e.target.value)}  required />
+              </Grid>
+              <Grid item xs={12} sm={4}>
                 <TextField fullWidth label="Description" name="description" variant="outlined" onChange={(e) => setDescription(e.target.value)} multiline rows={4} required />
               </Grid>
             </Grid>
             <Grid item xs={12} container justifyContent="flex-end">
             <Button style={{ marginTop: '20px' }} variant="contained"sx={{ mr: 5, width: 200 }} color="primary" type="submit">
-              Upload
+              Donate
             </Button>
             </Grid>
           </form>

@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->get('/validate-token',[UserController::class,
 Route::middleware('auth:sanctum')->get('/user/profile', [UserController::class, 'getProfile']);
 Route::middleware('auth:sanctum')->put('/user/profile', [UserController::class, 'updateProfile']);
 Route::middleware('auth:sanctum')->put('/user/change-password', [UserController::class, 'changePassword']);
-Route::middleware('auth:sanctum')->post('addfood', [FoodDonationsController::class, 'store']);
-Route::middleware('auth:sanctum')->get('/user-donations', [FoodDonationsController::class, 'userDonations']);
+Route::get('/user/is-profile-complete', [UserController::class, 'isProfileComplete'])->middleware('auth:sanctum');
 // Route to fetch application settings
 Route::get('/settings', [SettingsController::class, 'getSettings']);
+Route::post('/reset-password', [UserController::class, 'resetPassword']);

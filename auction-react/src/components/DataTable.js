@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Table,
   TableHead,
@@ -9,10 +10,11 @@ import {
   TableSortLabel,
   TablePagination,
   TextField,
+  TableContainer,
 } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
-const DataTable = ({ columns, rows }) => {
+const DataTable = ({ columns, rows, actionButton, detailPageLink, actionButtonText}) => {
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +80,7 @@ const DataTable = ({ columns, rows }) => {
         onChange={handleSearch}
         sx={{ marginBottom: '1rem' }}
       />
+       <TableContainer style={{maxWidth: '100%', overflowX: 'auto'}}>
       <Table>
         <TableHead>
           <TableRow>
@@ -120,15 +123,15 @@ const DataTable = ({ columns, rows }) => {
               {columns.map((column) => (
                 <TableCell key={column.field}>{row[column.field]}</TableCell>
               ))}
-              <TableCell>
-                <Button variant="contained" size="small">
-                  View
-                </Button>
-              </TableCell>
+               <TableCell>
+            {actionButton(row)}
+          </TableCell>
+
             </TableRow>
           ))}
         </TableBody>
       </Table>
+      </TableContainer>
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
