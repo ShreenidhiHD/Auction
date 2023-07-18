@@ -52,3 +52,13 @@ Route::middleware('auth:sanctum')->get('/show_bids/{auction_id}',[BidsController
 Route::middleware('auth:sanctum')->get('/show_bid/{bid_id}',[BidsController::class, 'read_by_id']);
 Route::middleware('auth:sanctum')->get('/my_participation/{user_id}',[BidsController::class, 'read_by_user_id']);
 Route::middleware('auth:sanctum')->get('/delete_bid/{bid_id}',[BidsController::class, 'delete']);
+
+//Admin routes
+Route::middleware('auth:sanctum')->get('/admin/users',[AdminController::class, 'view_users']);
+Route::middleware('auth:sanctum')->get('/admin/users_update/{user_id}/{status}',[AdminController::class, 'update_user']);
+Route::middleware('auth:sanctum')->get('/admin/auctions',[AdminController::class, 'auctions']);
+Route::middleware('auth:sanctum')->get('/admin/auctions_update/{auction_id}/{status}',[AdminController::class, 'update_auction']);
+Route::middleware('auth:sanctum')->get('/admin/bids/{auction_id}',[AdminController::class, 'bids']);
+Route::middleware('auth:sanctum')->get('/admin/auction_by_id/{id}',[AdminController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->get('/admin/reported_auctions',[AdminController::class, 'reported_auctions']);
+Route::middleware('auth:sanctum')->get('/admin/reported_auctions_update/{auction_id}/{status}',[AdminController::class, 'reported_auctions']);
