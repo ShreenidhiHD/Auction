@@ -31,6 +31,7 @@ const ResponsiveAppBar = () => {
     { name: 'Home', path: '/UserHome' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
+    { name: 'Profile', path: '/UserProfile' },
    
   ];
 

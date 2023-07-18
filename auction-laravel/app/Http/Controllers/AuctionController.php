@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\AuctionModel;
 use App\Models\auction_images;
+use Carbon\Carbon;
 
 class AuctionController extends Controller
 {
@@ -14,35 +15,36 @@ class AuctionController extends Controller
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-
+    
         //Validation
         $validated = $request->validate([
             'auction_name' => 'required|string',
             'product_name' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'start_price' => 'required|number',
+            'start_price' => 'required|numeric',
             'product_description' => 'required|string',
             'product_category' => 'required|string',
             'product_certification' => 'required|string',
             'status' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
+    
         $validated['created_by']=$user->id;
         $validated['delivery_status']='pending';
-
-        if(date_created($validated->end_date)<=date_created($validated->start_date)){ return response()->json(['error' => 'Date range is invalid'], 401); }
-
+    
+        if (Carbon::parse($validated['end_date'])->lte(Carbon::parse($validated['start_date']))) {
+            return response()->json(['error' => 'End date must be greater than start date.'], 400);
+        }
+        
+    
         $imageName = time().'.'.$request->image->extension();
-
         $request->image->move(public_path('images'), $imageName);
-
+    
         //Create new auction
         $status=AuctionModel::insertGetId($validated);
         
         $upload_status=auction_images::create(['auction_id'=>$status,'image_path'=>$imageName]);
-
+    
         if($status and $upload_status){ return response()->json(['message' => 'Auction created successfully.'], 200); }
         else{
             $delete_auction=AuctionModel::find($status);
@@ -50,6 +52,7 @@ class AuctionController extends Controller
             return response()->json(['error' => 'Unable to create auction! Try again.'], 401);
         }
     }
+    
 
     public function read(){
         $user=$request->user();

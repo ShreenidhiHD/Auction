@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Env;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\FoodDonationsController;
+use App\Http\Controllers\AuctionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes

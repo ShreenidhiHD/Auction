@@ -10,4 +10,8 @@ class auction_images extends Model
     use HasFactory;
 
     protected $table = 'auction_images';
+
+    protected $fillable = ['auction_id', 'image_path'];
+
+    public $timestamps = false;
 }
