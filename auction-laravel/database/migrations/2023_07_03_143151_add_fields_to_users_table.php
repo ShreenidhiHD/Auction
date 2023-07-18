@@ -18,6 +18,8 @@ class AddFieldsToUsersTable extends Migration
             $table->string('whatsapp')->nullable();
             $table->string('address')->nullable();
             $table->string('pincode')->nullable();
+            $table->string('status')->default('active');
+            $table->string('role')->default('user');
         });
     }
 
