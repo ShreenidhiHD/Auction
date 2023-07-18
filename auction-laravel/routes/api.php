@@ -40,12 +40,15 @@ Route::middleware('auth:sanctum')->post('/create_auction',[AuctionController::cl
 Route::middleware('auth:sanctum')->get('/show_auction',[AuctionController::class, 'read']);
 Route::middleware('auth:sanctum')->post('/update_auction',[AuctionController::class, 'update']);
 Route::middleware('auth:sanctum')->get('/delete_auction/{id}',[AuctionController::class, 'delete']);
-Route::middleware('auth:sanctum')->get('/show_auction_by_id/{id}',[AuctionController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->get('/result_page/{id}',[AuctionController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->get('/my_auctions/{user_id}',[AuctionController::class, 'read_by_user_id']);
 Route::middleware('auth:sanctum')->post('/announce_winner',[AuctionController::class, 'update_winner']);
 Route::middleware('auth:sanctum')->post('/update_delivery_status',[AuctionController::class, 'update_delivery_status']);
+Route::middleware('auth:sanctum')->get('/report_auction/{auction_id}',[AuctionController::class, 'report_auction']);
 
 //Bids routes
 Route::middleware('auth:sanctum')->post('/create_bid',[BidsController::class, 'create']);
 Route::middleware('auth:sanctum')->get('/show_bids/{auction_id}',[BidsController::class, 'read']);
 Route::middleware('auth:sanctum')->get('/show_bid/{bid_id}',[BidsController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->get('/my_participation/{user_id}',[BidsController::class, 'read_by_user_id']);
 Route::middleware('auth:sanctum')->get('/delete_bid/{bid_id}',[BidsController::class, 'delete']);
