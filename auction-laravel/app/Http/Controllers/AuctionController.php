@@ -32,6 +32,8 @@ class AuctionController extends Controller
         $validated['created_by']=$user->id;
         $validated['delivery_status']='pending';
 
+        if(date_created($validated->end_date)<=date_created($validated->start_date)){ return response()->json(['error' => 'Date range is invalid'], 401); }
+
         $imageName = time().'.'.$request->image->extension();
 
         $request->image->move(public_path('images'), $imageName);
@@ -118,6 +120,8 @@ class AuctionController extends Controller
             'product_certification' => 'required|string',
             'status' => 'required|string',
         ]);
+
+        if(date_created($validated->end_date)<=date_created($validated->start_date)){ return response()->json(['error' => 'Date range is invalid'], 401); }
 
         //Update auction
         $auction=AuctionModel::find($request->id);

@@ -30,6 +30,11 @@ class BidsController extends Controller
         else{ return false; }
     }
 
+    private function is_in_date_range($start_date,$end_date,$today){
+        if(date_create($end_date)<date_create($today) and date_create($today)<date_create($start_date)){ return true; }
+        else{ return false; }
+    }
+
     public function create(Request $request){
         $user=$request->user();
         if (!$user) {
@@ -52,6 +57,10 @@ class BidsController extends Controller
         //Compare to previous bids
         if($this->previous_bid_amount($request->auction_id)>=$request->price){ return response()->json(['error' => 'Please bid higher than previous bid'], 401); }
 
+        //Check if date range is correct
+        $auction=AuctionModel::where('id',$request->auction_id)->first();
+        if($this->is_in_date_range($auction->start_date,$auction->end_date,date('Y-m-d'))){ return response()->json(['error' => 'Auction is not active'], 401); }
+        
         //Create new bid
         $status=BidsModel::create($validated);
 
