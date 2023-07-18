@@ -198,6 +198,10 @@ class AuctionController extends Controller
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
+        $winner=AuctionModel::where('id',$request->id)->first();
+
+        if($winner->winner!=""){ return response()->json(['error' => 'Winner is already announced for this auction.'], 401); }
+
         $auction=AuctionModel::find($request->id);
 
         $auction->winner=$request->winner;
@@ -213,6 +217,10 @@ class AuctionController extends Controller
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
+
+        $delivery=AuctionModel::where('id',$request->id)->first();
+
+        if($delivery->delivery_status=='delivered'){ return response()->json(['error' => 'Product is already delivered to winner of the auction.'], 401); }
 
         $auction=AuctionModel::find($request->id);
 
