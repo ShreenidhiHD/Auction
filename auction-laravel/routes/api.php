@@ -43,3 +43,9 @@ Route::middleware('auth:sanctum')->get('/delete_auction/{id}',[AuctionController
 Route::middleware('auth:sanctum')->get('/show_auction_by_id/{id}',[AuctionController::class, 'read_by_id']);
 Route::middleware('auth:sanctum')->post('/announce_winner',[AuctionController::class, 'update_winner']);
 Route::middleware('auth:sanctum')->post('/update_delivery_status',[AuctionController::class, 'update_delivery_status']);
+
+//Bids routes
+Route::middleware('auth:sanctum')->post('/create_bid',[BidsController::class, 'create']);
+Route::middleware('auth:sanctum')->get('/show_bids/{auction_id}',[BidsController::class, 'read']);
+Route::middleware('auth:sanctum')->get('/show_bid/{bid_id}',[BidsController::class, 'read_by_id']);
+Route::middleware('auth:sanctum')->get('/delete_bid/{bid_id}',[BidsController::class, 'delete']);

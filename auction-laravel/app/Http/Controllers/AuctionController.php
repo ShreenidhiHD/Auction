@@ -106,7 +106,7 @@ class AuctionController extends Controller
             'status' => 'required|string',
         ]);
 
-        //Create new auction
+        //Update auction
         $auction=AuctionModel::find($request->id);
 
         $auction->auction_name=$request->auction_name;
@@ -130,6 +130,9 @@ class AuctionController extends Controller
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
+
+        $is=AuctionModel::where('id',$id)->first();
+        if($is->status=='inactive'){ return response()->json(['error' => 'Auction already deleted.'], 401); }
 
         $auction=AuctionModel::find($id);
 

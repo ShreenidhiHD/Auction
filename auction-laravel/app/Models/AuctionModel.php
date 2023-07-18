@@ -9,6 +9,8 @@ class AuctionModel extends Model
 {
     use HasFactory;
 
+    protected $table = 'auctions';
+
     protected $fillable = [
         'created_by',
         'auction_name',
