@@ -20,12 +20,12 @@ const UserHome = () => {
         // Handle unauthenticated state
         return;
       }
-        const response = await axios.get('http://localhost:8000/api/test/re', {
+        const response = await axios.get('http://localhost:8000/api/show_auction', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        setData(response.data.donation);
+        setData(response.data.rows);
       } catch (error) {
         console.error(error);
       }

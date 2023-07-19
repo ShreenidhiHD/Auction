@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
-import { Container, Grid, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import Button from '@mui/material/Button';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ShareIcon from '@mui/icons-material/Share';
 import Alert from '@mui/material/Alert';
 import axios from 'axios';
 import Menu from '@mui/material/Menu';
@@ -22,11 +21,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import Chip from '@mui/material/Chip';
+import CardMedia from '@mui/material/CardMedia';
 import { useNavigate } from "react-router-dom";
 
 
-const RequestButton = styled(Button)`
+const BidButton = styled(Button)`
   color: white;
   background-color: #f50057;
   &:hover {
@@ -34,34 +33,16 @@ const RequestButton = styled(Button)`
   }
 `;
 
-const RecipeReviewCard = ({ item }) => {
+const BiddingCard = ({ item }) => {
   const navigate = useNavigate();
-  const [requested, setRequested] = useState(item.buttonStatus === 'request');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [buttonStatus, setButtonStatus] = useState(item.buttonStatus);
+  const [buttonStatus, setButtonStatus] = useState(item.status);
   const [openDialog, setOpenDialog] = useState(false);
-  const [description, setDescription] = useState('');
-
-  const [openDetails, setOpenDetails] = useState(false);
-
-  const handleClickOpenDetails = () => {
-    const authToken = localStorage.getItem('authToken');
-    if (!authToken) {
-      // Redirect to login page if user is not authenticated
-      navigate("/login");
-    } else {
-      // Continue with your previous logic
-      setOpenDetails(true);
-    }
-    
-  };
-
-  const handleCloseDetails = () => {
-    setOpenDetails(false);
-  };
-  const handleRequestClick = async () => {
+  const [bidAmount, setBidAmount] = useState('');
+ 
+  const handleBidClick = async () => {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {
       // Redirect to login page if user is not authenticated
@@ -77,7 +58,7 @@ const RecipeReviewCard = ({ item }) => {
     setOpenDialog(false);
   };
 
-  const handleConfirmRequest = async () => {
+  const handleConfirmBid = async () => {
     try {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) {
@@ -85,15 +66,15 @@ const RecipeReviewCard = ({ item }) => {
         return;
       }
 
-      const requestedData = {
-        donation_id: item.id,
-        description: description, // use user input instead of hardcoded string
+      const bidData = {
+        auction_id: item.id,
+        price: bidAmount,
       };
 
       try {
         const response = await axios.post(
-          'http://localhost:8000/api/purchase/requests',
-          requestedData,
+          'http://localhost:8000/api/create_bid', // change this URL to match your bidding API
+          bidData,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -101,16 +82,13 @@ const RecipeReviewCard = ({ item }) => {
           }
         );
 
-        setRequested(true);
         setMessage(response.data.message);
         setMessageType('success');
-        setButtonStatus('cancel');
-        console.log(item.id);
         handleDialogClose();
 
       } catch (error) {
         console.error(error);
-        setMessage('Request failed');
+        setMessage('Bid submission failed');
         setMessageType('error');
       }
 
@@ -119,14 +97,7 @@ const RecipeReviewCard = ({ item }) => {
         setMessageType('');
       }, 3000);
     } catch (error) {
-      let errorMessage;
-      if (typeof error.response.data.message === 'object') {
-        errorMessage = Object.values(error.response.data.message).join(' ');
-      } else {
-        errorMessage = error.response.data.message;
-      }
-
-      setMessage(errorMessage);
+      setMessage('Bid submission failed');
       setMessageType('error');
 
       setTimeout(() => {
@@ -135,49 +106,7 @@ const RecipeReviewCard = ({ item }) => {
       }, 3000);
     }
   };
-
-  const handleCancelClick = () => {
-    try {
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
-        // Handle unauthenticated state
-        return;
-      }
-
-      axios
-        .get(`http://localhost:8000/api/purchase/requests/cancel/${item.id}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        })
-        .then(response => {
-          setRequested(false);
-          setMessage(response.data.message);
-          setMessageType('success');
-          console.log(item.id);
-          setButtonStatus('request');
-        })
-        .catch(error => {
-          console.error(error);
-          setMessage('Cancellation failed');
-          setMessageType('error');
-        });
-
-      setTimeout(() => {
-        setMessage('');
-        setMessageType('');
-      }, 3000);
-    } catch (error) {
-      console.error(error);
-      setMessage('Cancellation failed');
-      setMessageType('error');
-
-      setTimeout(() => {
-        setMessage('');
-        setMessageType('');
-      }, 3000);
-    }
-  };
+  const imageURL = `http://localhost:8000/images/${item.image_url.substring(item.image_url.lastIndexOf('/') + 1)}`;
 
   return (
     <Card>
@@ -185,21 +114,21 @@ const RecipeReviewCard = ({ item }) => {
         open={openDialog}
         onClose={handleDialogClose}
       >
-        <DialogTitle>{"Enter your description"}</DialogTitle>
+        <DialogTitle>{"Enter your bid amount"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter your description below:
+            Please enter your bid amount below:
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
-            id="description"
-            label="Description"
-            type="text"
+            id="bidAmount"
+            label="Bid Amount"
+            type="number"
             fullWidth
             variant="standard"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={bidAmount}
+            onChange={(e) => setBidAmount(e.target.value)}
             required
           />
         </DialogContent>
@@ -207,194 +136,105 @@ const RecipeReviewCard = ({ item }) => {
           <Button onClick={handleDialogClose}>
             Cancel
           </Button>
-          <Button onClick={handleConfirmRequest}>
-            Request
+          <Button onClick={handleConfirmBid}>
+            Submit Bid
           </Button>
         </DialogActions>
       </Dialog>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            {item.username.charAt(0).toUpperCase()}
+            {item.created_by.charAt(0).toUpperCase()}
           </Avatar>
-  }
-  action={
-    <>
-      <IconButton 
-        aria-label="settings"
-        onClick={(event) => setAnchorEl(event.currentTarget)}
-      >
-        <MoreVertIcon />
-      </IconButton>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        <MenuItem onClick={() => {
-          setAnchorEl(null);
-          // Here you can put the same code used in share button click handler
-          if (navigator.share) {
-            navigator.share({
-              title: 'Share Donation',
-              text: 'Check out this donation!',
-              url: item.shareableLink,
-            })
-            .then(() => console.log('Successful share'))
-            .catch((error) => console.log('Error sharing', error));
-          } else {
-            alert(`Share this link: ${item.shareableLink}`);
-          }
-        }}>
-          Share
-        </MenuItem>
-        <MenuItem onClick={() => {
-          setAnchorEl(null);
-          window.location.href = `mailto:?subject=I want to report this donation&body=Check out this donation: ${item.shareableLink}`;
-        }}>
-          Report
-        </MenuItem>
-      </Menu>
-    </>
-  }
-  title={`Created by: ${item.username}`}
-  subheader={item.prepared_date}
-/>
+        }
+        action={
+          <>
+            <IconButton 
+              aria-label="settings"
+              onClick={(event) => setAnchorEl(event.currentTarget)}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+            >
+              <MenuItem onClick={() => {
+                setAnchorEl(null);
+                // Here you can put the same code used in share button click handler
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'Share Donation',
+                    text: 'Check out this donation!',
+                    url: item.shareableLink,
+                  })
+                  .then(() => console.log('Successful share'))
+                  .catch((error) => console.log('Error sharing', error));
+                } else {
+                  alert(`Share this link: ${item.shareableLink}`);
+                }
+              }}>
+                Share
+              </MenuItem>
+              <MenuItem onClick={() => {
+                setAnchorEl(null);
+                window.location.href = `mailto:?subject=I want to report this donation&body=Check out this donation: ${item.shareableLink}`;
+              }}>
+                Report
+              </MenuItem>
+            </Menu>
+          </>
+        }
+        title={`Created by: ${item.created_by}`}
+        subheader={item.start_date}
+      />
 
 
-<Box display="flex" justifyContent="flex-end" style={{ marginRight: '50px' }}>
-    {item.verified && <Chip label="Verified" color="primary" size="small" />}
-</Box>
+  <CardMedia
+    component="img"
+    height="400" // Increase image height to give more emphasis
+    image={imageURL}
+    alt={item.product_name}
+  />
 
-      <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          Food type: {item.food_type} <br />
-          Number of plates: {item.number_of_plates} <br />
-          Location: {item.location}
-        </Typography>
-      </CardContent>
-      <Dialog open={openDetails}
-  onClose={handleCloseDetails}
-  PaperProps={{style: {width: "600px"}}} >
-        <DialogTitle>{"Donation Details"}</DialogTitle>
-  <DialogContent>
-  <Grid container spacing={1}>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Food type:</b> {item.food_type} 
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Number of plates:</b> {item.number_of_plates} 
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Location:</b> {item.location}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Delivery Status:</b> {item.delivery_status}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Price:</b> {item.price}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Expiry in days:</b> {item.expiry_in_days}
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Event Name:</b> {item.event_name}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Description:</b> {item.description}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">
-              <b>Address:</b> {item.city}, {item.state}, {item.country}, {item.pincode}
-            </Typography>
-          </Grid>
-        </Grid>
-  </DialogContent>
-        
-        <DialogActions>
-          <Button onClick={handleCloseDetails}>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <CardActions disableSpacing>
-      {buttonStatus === 'donater' ? (
-        <Typography variant="body1" color="text.primary">
-          Thanks for donating
-        </Typography>
-      ) : (
-        <>
-          {buttonStatus === 'cancel' ? (
-            <RequestButton onClick={handleCancelClick}>Cancel</RequestButton>
-          ) : buttonStatus === 'accepted' ? (
-            <Typography variant="body1" color="text.primary">
-              Your request accepted
-            </Typography>
-          ) : (
-            <RequestButton onClick={handleRequestClick}>Request</RequestButton>
-          )}
-        </>
-      )}
+  <CardContent>
+    <Typography variant="h5" color="text.primary" gutterBottom>
+      {item.product_name}
+    </Typography>
 
-        
-  <IconButton
-  aria-label="share"
-  style={{ marginRight: '10px' }}
-  onClick={() => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Share Donation',
-        text: 'Check out this donation!',
-        url: item.shareableLink,
-      })
-      .then(() => console.log('Successful share'))
-      .catch((error) => console.log('Error sharing', error));
-    } else {
-      alert(`Share this link: ${item.shareableLink}`);
-    }
-  }}
->
-  <ShareIcon />
-</IconButton>
-<Button
-  variant="contained"
-  style={{ 
-    marginRight: '10px',
-    backgroundColor: 'white',
-    color: 'black'
-  }}
-  onClick={handleClickOpenDetails}
->
-  Show Details
-</Button>
+    <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+      Category: {item.product_category}
+    </Typography>
 
-</CardActions>
+    <Typography variant="body2" color="text.secondary">
+      Start Date: {item.start_date} <br />
+      End Date: {item.end_date} <br />
+    </Typography>
 
-      {message && (
-        <Alert severity={messageType}>
-          {message}
-        </Alert>
-      )}
-    </Card>
+    <Typography variant="h6" color="text.primary">
+      Starting Price: INR{item.start_price} 
+    </Typography>
+  </CardContent>
+
+  <CardActions disableSpacing>
+    <Button variant="contained" color="primary" onClick={handleBidClick}>
+      Place Bid
+    </Button>
+  </CardActions>
+
+  {message && (
+    <Box mt={2}>
+      <Alert severity={messageType}>
+        {message}
+      </Alert>
+    </Box>
+  )}
+</Card>
+
   );
 };
 
-export default RecipeReviewCard;
+export default BiddingCard;

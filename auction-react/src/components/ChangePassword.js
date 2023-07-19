@@ -53,21 +53,22 @@ function ChangePassword() {
   
 
   return (
-    <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: 'column', justifyContent: '', marginTop: 10, alignItems: 'center', minHeight: '100vh' }}>
-      {message && (
+   
+      
+      <Card sx={{ width: '100%', padding: '2rem' }}>
+        {message && (
         <Alert severity={messageType}>
           {message}
         </Alert>
       )}
-      <Card sx={{ width: '100%', padding: '2rem' }}>
         <CardContent>
           <h2 className="text-center mb-4">Change Password</h2>
           <form onSubmit={submitForm} autoComplete="off">
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={12}>
                 <TextField label="Current Password" type="password" variant="outlined" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} fullWidth required />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={12}>
                 <TextField label="New Password" type="password" variant="outlined" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} fullWidth required />
               </Grid>
               <Grid item xs={12} container justifyContent="flex-end">
@@ -77,7 +78,7 @@ function ChangePassword() {
           </form>
         </CardContent>
       </Card>
-    </Container>
+    
   );
 }
 

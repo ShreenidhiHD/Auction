@@ -72,7 +72,7 @@ const ResponsiveAppBar = () => {
         key={page.name}
         component={RouterLink}
         to={page.path}
-        sx={{ mx: 2, color: '#333' }}
+        sx={{ mx: 2, color: 'white' }}
       >
         {page.name}
       </Button>
@@ -80,7 +80,7 @@ const ResponsiveAppBar = () => {
   }
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: '#f8f8f8', color: '#333' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: '#292F36', color: 'white' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
