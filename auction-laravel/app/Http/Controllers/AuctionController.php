@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\AuctionModel;
+use App\Models\BidsModel;
 use App\Models\auction_images;
 use Carbon\Carbon;
 
@@ -52,7 +53,11 @@ class AuctionController extends Controller
             return response()->json(['error' => 'Unable to create auction! Try again.'], 401);
         }
     }
-    
+
+    private function check_if_auction_finished($end_date,$date){
+        if(date_create($end_date)<date_create($date)){ return true; }
+        else{ return false; }
+    }
 
     public function read(Request $request){
         $user=$request->user();
@@ -78,25 +83,6 @@ class AuctionController extends Controller
             ['field' => 'status', 'headerName' => 'Status'],
             ['field' => 'winner', 'headerName' => 'Winner'],
         ];
-        
-        // $rows = $auctions->map(function($auction) {
-        //     $users=User::where('id',$auction->created_by)->first();
-        //     $winner=User::where('id',$auction->winner)->first();
-        //     return [
-        //         'id' => $auction->id,
-        //         'created_by' => ucfirst($users->name),
-        //         'auction_name' =>  ucfirst($auction->event_name),
-        //         'product_name' => ucfirst($auction->product_name),
-        //         'start_date' => date_format(date_create($auction->start_date),'d-m-Y'),
-        //         'end_date' => date_format(date_create($auction->end_date),'d-m-Y'),
-        //         'start_price' => $auction->start_price,
-        //         'product_description' => ucfirst($auction->product_description),
-        //         'product_category' => ucfirst($auction->product_category),
-        //         'product_certification' => ucfirst($auction->product_certification),
-        //         'delivery_status' => ucfirst($auction->delivery_status),
-        //         'status' => ucfirst($auction->status),
-        //         'winner' =>  $winner ? ucfirst($winner->name) : null,
-        //     ];
     
         $rows = $auctions->map(function($auction) {
             $users = User::where('id', $auction->created_by)->first();
@@ -112,6 +98,15 @@ class AuctionController extends Controller
             // $image_urls = $images->map(function($image) {
             //     return asset($image->image_path);
             // });
+
+            if($this->check_if_auction_finished($auction->end_date,date('Y-m-d')) and $auction->winner==""){
+                //Update winner
+                $bids=BidsModel::where('auction_id',$auction->id)->order_by('price','desc')->first();
+                $update_winner=AuctionModel::find($auction->id);
+                $update_winner->winner=$bids->bidder;
+                $update_winner->save();
+                $winner = User::where('id', $bids->bidder)->first();
+            }
         
             return [
                 'id' => $auction->id,

@@ -25,6 +25,12 @@ class BidsController extends Controller
         return $result ? $result->price : 0;
     }
 
+    private function is_less_than_start_price($auction_id,$bid_price){
+        $auction=AuctionModel::where('id',$auction_id)->first();
+        if($auction->start_price>$bid_price){ return true; }
+        else{ return false; }
+    }
+
     private function is_winner($user_id,$auction_id){
         $result=AuctionModel::where('id',$auction_id)->first();
         if($result->winner==$user_id){ return true; }
@@ -109,6 +115,9 @@ class BidsController extends Controller
     if ($this->is_in_date_range($auction->start_date, $auction->end_date, date('Y-m-d'))) {
         return response()->json(['error' => 'Auction is not active'], 401);
     }
+
+    //Check if bid is less than initial bidding price
+    if($this->is_less_than_start_price($request->auction_id,$request->price)){ return response()->json(['error' => 'Can not bid less than initial price'], 401); }
 
     // Create new bid
     $validated['bidder'] = $bidderId; // Add the bidder ID to the validated data
