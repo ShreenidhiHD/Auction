@@ -26,6 +26,7 @@ const UserHome = () => {
           },
         });
         setData(response.data.rows);
+        console.log(setData);
       } catch (error) {
         console.error(error);
       }

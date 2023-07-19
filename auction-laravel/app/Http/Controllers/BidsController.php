@@ -36,7 +36,6 @@ class BidsController extends Controller
         if($result->winner==$user_id){ return true; }
         else{ return false; }
     }
-
     private function is_in_date_range($start_date,$end_date,$today){
         if(date_create($end_date)<date_create($today) and date_create($today)<date_create($start_date)){ return true; }
         else{ return false; }
@@ -44,11 +43,23 @@ class BidsController extends Controller
     
     public function create(Request $request)
     {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
-        $bidderId = $user->id;
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+    $bidderId = $user->id;
+
+    // Validation
+    $validated = $request->validate([
+        'auction_id' => 'required|integer',
+        'price' => 'required|numeric',
+    ]);
+
+    // Check auction status
+    $auctionStatus = $this->auction_status($request->auction_id);
+    if ($auctionStatus != 'active') {
+        return response()->json(['error' => 'Auction is deactivated or reported as spam'], 401);
+    }
 
         // Validation
         $validated = $request->validate([
@@ -93,8 +104,10 @@ class BidsController extends Controller
             return response()->json(['error' => 'Unable to bid! Try again'], 401);
         }
     }
+   }
 
-    public function read($auction_id){
+
+    public function read(Request $request, $auction_id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -108,6 +121,7 @@ class BidsController extends Controller
             ['field' => 'auction_name', 'headerName' => 'Auction Name'],
             ['field' => 'created_by', 'headerName' => 'Created By'],
             ['field' => 'price', 'headerName' => 'Bids'],
+            ['field' => 'created_at', 'headerName' => 'Created At'],
         ];
 
         $rows = $bids->map(function($bid) {
@@ -118,6 +132,7 @@ class BidsController extends Controller
                 'auction_name' =>  ucfirst($auction->auction_name),
                 'created_by' => ucfirst($users->name),
                 'price' => number_format($bid->price,2),
+                'created_at' => $bid->created_at->format('d-m-Y H:i')
             ];
         });
     

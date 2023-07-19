@@ -192,7 +192,7 @@ class AuctionController extends Controller
         else{ return response()->json(['error' => 'Unable to delete auction! Try again.'], 401); }
     }
 
-    public function read_by_id($id){
+    public function read_by_id(Request $request,$id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -218,40 +218,52 @@ class AuctionController extends Controller
             ['field' => 'winner', 'headerName' => 'Winner'],
             ['field' => 'result', 'headerName' => 'Result'],
         ];
+       
+        $users=User::where('id',$auctions->created_by)->first();
+       $winnerName = null;
+       if ($auctions->winner != null) {
+        $winnerUser = User::where('id', $auctions->winner)->first();
+            if ($winnerUser) {
+                $winnerName = ucfirst($winnerUser->name);
+            }    
+       }
+        $currentUserId = $user->id;
+        $users = User::where('id', $auctions->created_by)->first();
+        $currentUserId = $users->id === $user->id ? 0 : 1;        
+        $result="";
+        if($auctions->winner==$user->id){ $result='You won the auction'; }
+        else{ $result='Better luck next time'; }
+        $images = auction_images::where('auction_id', $auctions->id)->first();
+
+        $image_name = "";
+        if ($images) {
+            $image_name = $images->image_path;
+        }
         
-        $rows = $auctions->map(function($auction) {
-            $users=User::where('id',$auction->created_by)->first();
-            $winner='';
-            if($auction->winner!=''){ $winner=User::where('id',$auction->winner)->first(); }
-            $result="";
-            if($auction->winner==$user->id){ $result='You won the auction'; }
-            else{ $result='Better luck next time'; }
-            $image_name=Array();
-            $images=auction_images::where('auction_id',$auction->id)->get();
-            foreach($images as $image){ array_push($image_name,$image->image_path); }
-            return [
-                'id' => $auction->id,
-                'image'=>$image_name,
-                'created_by' => ucfirst($users->name),
-                'auction_name' =>  ucfirst($auction->event_name),
-                'product_name' => ucfirst($auction->product_name),
-                'start_date' => date_format(date_create($auction->start_date),'d-m-Y'),
-                'end_date' => date_format(date_create($auction->end_date),'d-m-Y'),
-                'start_price' => $auction->start_price,
-                'product_description' => ucfirst($auction->product_description),
-                'product_category' => ucfirst($auction->product_category),
-                'product_certification' => ucfirst($auction->product_certification),
-                'delivery_status' => ucfirst($auction->delivery_status),
-                'status' => ucfirst($auction->status),
-                'winner' =>  ucfirst($winner->name),
-                'result'=> ucfirst($result),
-            ];
-        });
-    
+        $row = [
+            'id' => $auctions->id,
+            'image'=>$image_name,
+            'created_by' => ucfirst($users->name),
+            'auction_name' =>  ucfirst($auctions->event_name),
+            'product_name' => ucfirst($auctions->product_name),
+            'start_date' => date_format(date_create($auctions->start_date),'d-m-Y'),
+            'end_date' => date_format(date_create($auctions->end_date),'d-m-Y'),
+            'start_price' => $auctions->start_price,
+            'product_description' => ucfirst($auctions->product_description),
+            'product_category' => ucfirst($auctions->product_category),
+            'product_certification' => ucfirst($auctions->product_certification),
+            'delivery_status' => ucfirst($auctions->delivery_status),
+            'status' => ucfirst($auctions->status),
+            'winner' => $winnerName,
+            'result'=> ucfirst($result),
+            'currentUserId' => $currentUserId,
+        ];
+       
         return response()->json([
             'columns' => $columns,
-            'rows' => $rows
+            'rows' => [$row]
         ]);
+        
     }
 
     public function read_by_user_id($user_id){
