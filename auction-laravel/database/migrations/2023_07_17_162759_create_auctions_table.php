@@ -24,9 +24,10 @@ class CreateAuctionsTable extends Migration
             $table->text('product_description');
             $table->text('product_category');
             $table->text('product_certification');
-            $table->enum('delivery_status', ['not_shipped', 'shipped', 'delivered', 'pending']);
+            $table->enum('delivery_status', ['assigned', 'shipped', 'delivered', 'pending','verified','rejected']);
             $table->enum('status', ['active', 'inactive','reported']);
             $table->integer('winner')->nullable();
+			$table->integer('manager')->nullable();
             $table->timestamps();
         });
     }
