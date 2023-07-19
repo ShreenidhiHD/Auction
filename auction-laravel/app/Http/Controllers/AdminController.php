@@ -7,6 +7,14 @@ use App\Models\User;
 use App\Models\AuctionModel;
 use App\Models\BidsModel;
 use App\Models\auction_images;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
+use PDOException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use App\Helpers\EmailHelper;
 
 class AdminController extends Controller
 {
@@ -300,5 +308,47 @@ class AdminController extends Controller
             'columns' => $columns,
             'rows' => $rows
         ]);
+    }
+
+    private function quickRandom($length = 16)
+    {
+        $pool = '123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+
+        return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
+    }
+
+    public function create_manager(Request $request){
+        $validate = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+        ]);
+
+        $newPassword=$this->quickRandom();// Generates a random 10 character password
+        $validate['password'] = Hash::make($newPassword);
+        $validate['role']='manager';
+
+        $user = User::create($validate);
+
+        try {
+            // Prepare email data
+            $emailData = [
+                'to' => $user->email,
+                'subject' => 'Your password has been reset',
+                'data' => [
+                    'name' => $user->name,
+                    'message' => 'Your new password is: <b>' . $newPassword . '</b>',
+                ],
+            ];
+        
+            // Send email notification using your custom helper
+            EmailHelper::mailSendGlobal($emailData['to'], $emailData['subject'], $emailData['data']);
+            
+        } catch (\Exception $e) {
+            // Log the exception or handle it in another way
+            \Log::error('Failed to send email: '.$e->getMessage());
+        }
+
+        if($user){ return response()->json(['message' => 'Manager account added successfully.'], 200); }
+        else{ return response()->json(['error' => 'Unable to create manager account! Try again.'], 401); }
     }
 }

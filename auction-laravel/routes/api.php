@@ -8,6 +8,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\AuctionController;
 use App\Http\Controllers\BidsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ManagerController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -64,3 +65,10 @@ Route::middleware('auth:sanctum')->get('/admin/bids/{auction_id}',[AdminControll
 Route::middleware('auth:sanctum')->get('/admin/auction_by_id/{id}',[AdminController::class, 'read_by_id']);
 Route::middleware('auth:sanctum')->get('/admin/reported_auctions',[AdminController::class, 'reported_auctions']);
 Route::middleware('auth:sanctum')->get('/admin/reported_auctions_update/{auction_id}/{status}',[AdminController::class, 'reported_auctions']);
+Route::middleware('auth:sanctum')->get('/admin/create_manager',[AdminController::class, 'create_manager']);
+
+//Manager routes
+Route::middleware('auth:sanctum')->get('/manager/assigned_auctions',[ManagerController::class, 'read']);
+Route::middleware('auth:sanctum')->get('/manager/verify/{auction_id}/{status}',[ManagerController::class, 'update_auction']);
+Route::middleware('auth:sanctum')->get('/manager/ship/{auction_id}/{status}',[ManagerController::class, 'update_auction']);
+Route::middleware('auth:sanctum')->get('/manager/delivery/{auction_id}/{status}',[ManagerController::class, 'update_auction']);

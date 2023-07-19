@@ -27,6 +27,7 @@ class CreateAuctionsTable extends Migration
             $table->enum('delivery_status', ['assigned', 'shipped', 'delivered', 'pending','verified']);
             $table->enum('status', ['active', 'inactive','reported']);
             $table->integer('winner')->nullable();
+			$table->integer('manager')->nullable();
             $table->timestamps();
         });
     }

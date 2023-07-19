@@ -228,7 +228,7 @@ class UserController extends Controller
 
         return response()->json(['message' => $role], 200);
     }
-    public static function quickRandom($length = 16)
+    private function quickRandom($length = 16)
     {
         $pool = '123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
 
