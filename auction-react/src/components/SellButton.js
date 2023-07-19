@@ -11,7 +11,7 @@ const SellButton = () => {
 
     return (
         <Button  color="inherit"  onClick={handleClick}>
-            Sell
+            Create Auction
         </Button>
     );
 }

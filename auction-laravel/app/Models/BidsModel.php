@@ -10,4 +10,10 @@ class BidsModel extends Model
     use HasFactory;
 
     protected $table = 'bids';
+
+    protected $fillable = [
+        'auction_id',
+        'bidder',
+        'price',
+    ];
 }

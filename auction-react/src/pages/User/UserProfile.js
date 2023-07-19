@@ -99,49 +99,59 @@ const Profile = () => {
   }
 
   return (
-    <div>
-      <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: 'column', justifyContent: '',marginTop: 10, alignItems: 'center', minHeight: '100vh' }}>
-        {/* Render the alert based on the message type */}
-      {message && (
+   
+   
+    
+    <Grid container spacing={2}>
+        <Grid item xs={12} md={9}>
+            <Card sx={{ width: '100%', padding: '2rem' }}>
+            {message && (
         <Alert severity={messageType === 'success' ? 'success' : 'error'}>
-          {message}
+            {message}
         </Alert>
-      )}
+    )}
 
-      <Card sx={{ width: '100%', padding: '2rem' }}>
-      <CardContent>
-        <h2 class="text-center mb-4">Profile</h2>
-        <form onSubmit={submitForm} autoComplete="off">
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Name" variant="outlined" value={name} onChange={(event) => handleInputChange(event, setName)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Mobile" variant="outlined" value={mobile} onChange={(event) => handleInputChange(event, setMobile)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Email" variant="outlined" value={email} onChange={(event) => handleInputChange(event, setEmail)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Whatsapp" variant="outlined" value={whatsapp} onChange={(event) => handleInputChange(event, setWhatsapp)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Address" variant="outlined" value={address} onChange={(event) => handleInputChange(event, setAddress)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label="Pincode" variant="outlined" value={pincode} onChange={(event) => handleInputChange(event, setPincode)} fullWidth required />
-            </Grid>
-            <Grid item xs={12} container justifyContent="flex-end">
-              <Button type="submit" variant="contained" color="primary" sx={{ mr: 5, width: 200 }}>Update</Button>
-            </Grid>
-          </Grid>
-        </form>
-        </CardContent>
-        </Card>
-        <ChangePassword />
-      </Container>
-    </div>
-  );
+                <CardContent>
+                    <h2 class="text-center mb-4">Profile</h2>
+                    <form onSubmit={submitForm} autoComplete="off">
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Name" variant="outlined" value={name} onChange={(event) => handleInputChange(event, setName)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Mobile" variant="outlined" value={mobile} onChange={(event) => handleInputChange(event, setMobile)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Email" variant="outlined" value={email} onChange={(event) => handleInputChange(event, setEmail)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Whatsapp" variant="outlined" value={whatsapp} onChange={(event) => handleInputChange(event, setWhatsapp)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Address" variant="outlined" value={address} onChange={(event) => handleInputChange(event, setAddress)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField label="Pincode" variant="outlined" value={pincode} onChange={(event) => handleInputChange(event, setPincode)} fullWidth required />
+                            </Grid>
+                            <Grid item xs={12} container justifyContent="flex-end">
+                                <Button type="submit" variant="contained" color="primary" sx={{ mr: 5, width: 200 }}>Update</Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+                </CardContent>
+            </Card>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+            
+                 
+                    <ChangePassword />
+                
+        </Grid>
+    </Grid>
+
+);
 };
+
 
 export default Profile;

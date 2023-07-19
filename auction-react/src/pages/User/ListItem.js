@@ -60,8 +60,9 @@ function ListItem() {
             
           if (response.status === 200) {
             console.log("success", response);
-            const form = document.getElementById('donatefood');
-            form.reset();
+            setTimeout(() => {
+              window.location.href = "/UserHome"; // assuming that your homepage route is '/'
+          }, 10000);
            
           } else {
             setMessage(response.data.message);
@@ -96,15 +97,16 @@ function ListItem() {
     return (
       <div style={{ marginTop: '20px', padding: '30px' }}>
         <h1 className='text-center'>Add Auction details here</h1>
-        <Card>
+       
+            <Grid container spacing={4}>
+              <Grid item xs={12} sm={8}>
+              <Card>
           {message && (
             <Alert severity={messageType}>
               {message}
             </Alert>
           )}
           <CardContent>
-            <Grid container spacing={4}>
-              <Grid item xs={12} sm={8}>
               <form onSubmit={handleSubmit} id="createAuction">
   <Grid container spacing={3}>
     <Grid item xs={12} sm={6}>
@@ -163,7 +165,8 @@ function ListItem() {
     </Grid>
   </Grid>
 </form>
-
+</CardContent>
+        </Card>
               </Grid>
               <Grid item xs={12} sm={3}>
               <Card>
@@ -205,8 +208,7 @@ function ListItem() {
 
               </Grid>
             </Grid>
-          </CardContent>
-        </Card>
+         
       </div>
     );
 }

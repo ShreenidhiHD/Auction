@@ -19,9 +19,10 @@ class BidsController extends Controller
         return $result->status;
     }
 
-    private function previous_bid_amount($auction_id){
-        $result=BidsModel::where('id',$auction_id)->latest('created_at')->first();
-        return $result->price;
+    private function previous_bid_amount($auction_id)
+    {
+        $result = BidsModel::where('auction_id', $auction_id)->latest('created_at')->first();
+        return $result ? $result->price : 0;
     }
 
     private function is_winner($user_id,$auction_id){
@@ -29,46 +30,97 @@ class BidsController extends Controller
         if($result->winner==$user_id){ return true; }
         else{ return false; }
     }
-
     private function is_in_date_range($start_date,$end_date,$today){
         if(date_create($end_date)<date_create($today) and date_create($today)<date_create($start_date)){ return true; }
         else{ return false; }
     }
 
-    public function create(Request $request){
-        $user=$request->user();
-        if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
-        }
+    // public function create(Request $request){
+    //     $user=$request->user();
+    //     if (!$user) {
+    //         return response()->json(['error' => 'User not authenticated'], 401);
+    //     }
+    //     $bidderId = $user->id;
+    //     //Validation
+    //     $validated = $request->validate([
+    //         'auction_id' => 'required|integer',
+    //         'price' => 'required|numeric',
+    //     ]);
 
-        //Validation
-        $validated = $request->validate([
-            'auction_id' => 'required|integer',
-            'bidder' => 'required|integer',
-            'price' => 'required|number',
-        ]);
+    //     //Check auction status
+    //     if($this->auction_status($request->auction_id)!='active'){ return response()->json(['error' => 'Auction is deactivated or reported as spam'], 401); }
 
-        //Check auction status
-        if($this->auction_status($request->auction_id)!='active'){ return response()->json(['error' => 'Auction is deactivated or reported as spam'], 401); }
+    //     //Check user status
+    //     if($this->user_status($request->bidder)!='active'){ return response()->json(['error' => 'User account is deactivated'], 401); }
 
-        //Check user status
-        if($this->user_status($request->bidder)!='active'){ return response()->json(['error' => 'User account is deactivated'], 401); }
+    //     //Compare to previous bids
+    //     if($this->previous_bid_amount($request->auction_id)>=$request->price){ return response()->json(['error' => 'Please bid higher than previous bid'], 401); }
 
-        //Compare to previous bids
-        if($this->previous_bid_amount($request->auction_id)>=$request->price){ return response()->json(['error' => 'Please bid higher than previous bid'], 401); }
-
-        //Check if date range is correct
-        $auction=AuctionModel::where('id',$request->auction_id)->first();
-        if($this->is_in_date_range($auction->start_date,$auction->end_date,date('Y-m-d'))){ return response()->json(['error' => 'Auction is not active'], 401); }
+    //     //Check if date range is correct
+    //     $auction=AuctionModel::where('id',$request->auction_id)->first();
+    //     if($this->is_in_date_range($auction->start_date,$auction->end_date,date('Y-m-d'))){ return response()->json(['error' => 'Auction is not active'], 401); }
         
-        //Create new bid
-        $status=BidsModel::create($validated);
+    //     //Create new bid
+    //     $validated['bidder'] = $bidderId; // Add the bidder ID to the validated data
+    //     $status = BidsModel::create($validated);
 
-        if($status){ return response()->json(['message' => 'Bid successful.'], 200); }
-        else{ return response()->json(['error' => 'Unable to bid! Try again.'], 401); }
+    //     if ($status) {
+    //         return response()->json(['message' => 'Bid successful.'], 200);
+    //     } else {
+    //         return response()->json(['error' => 'Unable to bid! Try again.'], 401);
+    //     }
+    // }
+    
+    public function create(Request $request)
+    {
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+    $bidderId = $user->id;
+
+    // Validation
+    $validated = $request->validate([
+        'auction_id' => 'required|integer',
+        'price' => 'required|numeric',
+    ]);
+
+    // Check auction status
+    $auctionStatus = $this->auction_status($request->auction_id);
+    if ($auctionStatus != 'active') {
+        return response()->json(['error' => 'Auction is deactivated or reported as spam'], 401);
     }
 
-    public function read($auction_id){
+    // Check user status
+    $userStatus = $this->user_status($bidderId);
+    if ($userStatus != 'active') {
+        return response()->json(['error' => 'User account is deactivated'], 401);
+    }
+
+    // Compare to previous bids
+    $previousBidAmount = $this->previous_bid_amount($request->auction_id);
+    if ($previousBidAmount >= $request->price) {
+        return response()->json(['error' => 'Please bid higher than the previous bid'], 401);
+    }
+
+    // Check if date range is correct
+    $auction = AuctionModel::where('id', $request->auction_id)->first();
+    if ($this->is_in_date_range($auction->start_date, $auction->end_date, date('Y-m-d'))) {
+        return response()->json(['error' => 'Auction is not active'], 401);
+    }
+
+    // Create new bid
+    $validated['bidder'] = $bidderId; // Add the bidder ID to the validated data
+    $status = BidsModel::create($validated);
+
+    if ($status) {
+        return response()->json(['message' => 'Bid successful'], 200);
+    } else {
+        return response()->json(['error' => 'Unable to bid! Try again'], 401);
+    }
+   }
+
+    public function read(Request $request, $auction_id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -82,6 +134,7 @@ class BidsController extends Controller
             ['field' => 'auction_name', 'headerName' => 'Auction Name'],
             ['field' => 'created_by', 'headerName' => 'Created By'],
             ['field' => 'price', 'headerName' => 'Bids'],
+            ['field' => 'created_at', 'headerName' => 'Created At'],
         ];
 
         $rows = $bids->map(function($bid) {
@@ -92,6 +145,7 @@ class BidsController extends Controller
                 'auction_name' =>  ucfirst($auction->auction_name),
                 'created_by' => ucfirst($users->name),
                 'price' => number_format($bid->price,2),
+                'created_at' => $bid->created_at->format('d-m-Y H:i')
             ];
         });
     
