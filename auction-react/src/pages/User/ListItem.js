@@ -1,59 +1,55 @@
-import { Grid, Card, CardContent, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Grid, Typography, Card, CardContent, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import { format } from 'date-fns';
 
 function ListItem() {
-    const [numberOfPlates, setNumberOfPlates] = useState('');
-    const [location, setLocation] = useState('');
-    const [deliveryStatus, setDeliveryStatus] = useState('');
-    const [price, setPrice] = useState('');
-    const [expiryInDays, setExpiryInDays] = useState('');
-    const [foodType, setFoodType] = useState('veg');
-    const [eventName, setEventName] = useState('');
-    const [description, setDescription] = useState('');
-    const [preparedDate, setPreparedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-    const [status, setStatus] = useState('active');
-    const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
-    const [state, setState] = useState('');
-    const [pincode, setPincode] = useState('');
+  const [auctionName, setAuctionName] = useState('');
+    const [productName, setProductName] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [startPrice, setStartPrice] = useState('');
+    const [productDescription, setProductDescription] = useState('');
+    const [productCategory, setProductCategory] = useState('');
+    const [productCertification, setProductCertification] = useState('');
+    const [status, setStatus] = useState('');
+    const [image, setImage] = useState(null);
     const [message, setMessage] = useState(null);
     const [messageType, setMessageType] = useState('success');
 
-  
+    const handleImageChange = (e) => {
+      setImage(e.target.files[0]);
+    }
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-          const authToken = localStorage.getItem('authToken');
-          if (!authToken) {
-            // Handle unauthenticated state
-            return;
-          }
-          
-          const foodData = {
-            number_of_plates: parseInt(numberOfPlates),
-            location,
-            delivery_status: deliveryStatus,
-            price,
-            expiry_in_days: expiryInDays,
-            food_type: foodType,
-            event_name: eventName,
-            description,
-            prepared_date: preparedDate,
-            status,
-            country: country,
-            state: state,
-            city: city,
-            pincode: pincode,
-          };
-          console.log(foodData);
-          const response = await axios.post('http://localhost:8000/api/addfood', foodData, {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          });
+      event.preventDefault();
+    
+      const formData = new FormData();
+      formData.append('auction_name', auctionName);
+      formData.append('product_name', productName);
+      formData.append('start_date', startDate);
+      formData.append('end_date', endDate);
+      formData.append('start_price', startPrice);
+      formData.append('product_description', productDescription);
+      formData.append('product_category', productCategory);
+      formData.append('product_certification', productCertification);
+      formData.append('status', status);
+      formData.append('image', image); // the file will be appended here
+      
+      try {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          // Handle unauthenticated state
+          return;
+        }
+    
+        const response = await axios.post('http://localhost:8000/api/create_auction', formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'multipart/form-data', // necessary for file upload
+          },
+        });
+        
           setMessage(response.data.message);
           setMessageType('success');
             // Clear the message after 3 seconds
@@ -64,8 +60,9 @@ function ListItem() {
             
           if (response.status === 200) {
             console.log("success", response);
-            const form = document.getElementById('donatefood');
-            form.reset();
+            setTimeout(() => {
+              window.location.href = "/UserHome"; // assuming that your homepage route is '/'
+          }, 10000);
            
           } else {
             setMessage(response.data.message);
@@ -79,114 +76,141 @@ function ListItem() {
           }
         } catch (error) {
           let errorMessage;
-        if (typeof error.response.data.message === 'object') {
-            errorMessage = Object.values(error.response.data.message).join(' ');
-        } else {
-            errorMessage = error.response.data.message;
-        }
-        setMessage(errorMessage);
-        setMessageType('error');
+          if (error.response && typeof error.response.data.message === 'object') {
+              errorMessage = Object.values(error.response.data.message).join(' ');
+          } else if (error.response) {
+              errorMessage = error.response.data.message;
+          } else {
+              errorMessage = error.message;
+          }
+          setMessage(errorMessage);
+          setMessageType('error');
           // Clear the message after 3 seconds
           setTimeout(() => {
-            setMessage('');
-            setMessageType('');
+              setMessage('');
+              setMessageType('');
           }, 3000);
       };
       
+      
     }
-  return (
-    <div style={{ marginTop: '20px', padding: '30px' }}>
-      <h1 className='text-center'>Add Food details here</h1>
-      <Card>
-      {message && (
-        <Alert severity={messageType}>
-          {message}
-        </Alert>
-      )}
-        <CardContent>
-        
-          <form onSubmit={handleSubmit} id="donatefood">
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Number of Plates" name="numberOfPlates" type="number" id="numberofplates" variant="outlined"  onChange={(e) => setNumberOfPlates(e.target.value)} required />
+    return (
+      <div style={{ marginTop: '20px', padding: '30px' }}>
+        <h1 className='text-center'>Add Auction details here</h1>
+       
+            <Grid container spacing={4}>
+              <Grid item xs={12} sm={8}>
+              <Card>
+          {message && (
+            <Alert severity={messageType}>
+              {message}
+            </Alert>
+          )}
+          <CardContent>
+              <form onSubmit={handleSubmit} id="createAuction">
+  <Grid container spacing={3}>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Auction Name" name="auctionName" variant="outlined" onChange={(e) => setAuctionName(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Product Name" name="productName" variant="outlined" onChange={(e) => setProductName(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Start Date" name="startDate" type="date" InputLabelProps={{ shrink: true }} variant="outlined" onChange={(e) => setStartDate(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="End Date" name="endDate" type="date" InputLabelProps={{ shrink: true }} variant="outlined" onChange={(e) => setEndDate(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Start Price" name="startPrice" type="number" variant="outlined" onChange={(e) => setStartPrice(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Product Description" name="productDescription" variant="outlined" onChange={(e) => setProductDescription(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Product Category" name="productCategory" variant="outlined" onChange={(e) => setProductCategory(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <TextField fullWidth label="Product Certification" name="productCertification" variant="outlined" onChange={(e) => setProductCertification(e.target.value)} required />
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <FormControl fullWidth variant="outlined" required>
+        <InputLabel id="status-label">Status</InputLabel>
+        <Select
+          labelId="status-label"
+          id="status"
+          label="Status"
+          name="status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <MenuItem value="active">Active</MenuItem>
+          <MenuItem value="deactive">Deactive</MenuItem>
+        </Select>
+      </FormControl>
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <input accept="image/*" id="raised-button-file" type="file" style={{ display: 'none' }} onChange={handleImageChange} />
+      <label htmlFor="raised-button-file">
+        <Button variant="raised" component="span" style={{ marginTop: '15px' }}>
+          Upload Product Image
+        </Button>
+      </label>
+      {image && <img src={URL.createObjectURL(image)} height="100" width="100" />}
+    </Grid>
+    <Grid item xs={12} container justifyContent="flex-end">
+      <Button style={{ marginTop: '20px' }} variant="contained" sx={{ mr: 5, width: 200 }} color="primary" type="submit">
+        Create Auction
+      </Button>
+    </Grid>
+  </Grid>
+</form>
+</CardContent>
+        </Card>
               </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Location" name="location" variant="outlined" onChange={(e) => setLocation(e.target.value)} required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Delivery Status" name="deliveryStatus" variant="outlined" onChange={(e) => setDeliveryStatus(e.target.value)} required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Price" name="price" type="number" variant="outlined" onChange={(e) => setPrice(e.target.value)} required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Expiry in Days" name="expiryInDays" type="number" variant="outlined" onChange={(e) => setExpiryInDays(e.target.value)} required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth variant="outlined"  required>
-                  <InputLabel id="foodType-label">Food Type</InputLabel>
-                  <Select
-                    labelId="foodType-label"
-                    id="foodType"
-                    label="Food Type"
-                    name="foodType"
-                    value={foodType}
-                    onChange={(e) => setFoodType(e.target.value)} 
-                  >
-                    <MenuItem value="veg">Veg</MenuItem>
-                    <MenuItem value="non_veg">Non-Veg</MenuItem>
-                    <MenuItem value="both">Both</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Event Name" name="eventName" variant="outlined" onChange={(e) => setEventName(e.target.value)} required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Prepared Date" name="preparedDate" type="date"  value={preparedDate}  onChange={(e) => setPreparedDate(e.target.value)} InputLabelProps={{ shrink: true }} variant="outlined" required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <FormControl fullWidth variant="outlined"   required>
-                  <InputLabel id="status-label">Status</InputLabel>
-                  <Select
-                    labelId="status-label"
-                    id="status"
-                    label="Status"
-                    name="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <MenuItem value="active">Active</MenuItem>
-                    <MenuItem value="deactive">Deactive</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Country" name="country" variant="outlined" onChange={(e) => setCountry(e.target.value)}   required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="State" name="state" variant="outlined" onChange={(e) => setState(e.target.value)}   required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="City" name="city" variant="outlined" onChange={(e) => setCity(e.target.value)}   required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Pincode" name="pincode" type="number" variant="outlined" onChange={(e) => setPincode(e.target.value)}  required />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <TextField fullWidth label="Description" name="description" variant="outlined" onChange={(e) => setDescription(e.target.value)} multiline rows={4} required />
+              <Grid item xs={12} sm={3}>
+              <Card>
+  <CardContent>
+  <Typography variant="h5" component="div" align="center">Auction Preview</Typography>
+    <Typography variant="body2" align="center">
+      {image ? <img src={URL.createObjectURL(image)} alt="preview" height="200" width="200"/> : "No image selected"}
+    </Typography>
+   
+    <Typography variant="body2">
+      <strong>Auction Name:</strong> {auctionName}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Product Name:</strong> {productName}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Start Date:</strong> {startDate}
+    </Typography>
+    <Typography variant="body2">
+      <strong>End Date:</strong> {endDate}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Start Price:</strong> {startPrice}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Product Description:</strong> {productDescription}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Product Category:</strong> {productCategory}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Product Certification:</strong> {productCertification}
+    </Typography>
+    <Typography variant="body2">
+      <strong>Status:</strong> {status}
+    </Typography>
+  </CardContent>
+</Card>
+
               </Grid>
             </Grid>
-            <Grid item xs={12} container justifyContent="flex-end">
-            <Button style={{ marginTop: '20px' }} variant="contained"sx={{ mr: 5, width: 200 }} color="primary" type="submit">
-              Donate
-            </Button>
-            </Grid>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+         
+      </div>
+    );
 }
 
 export default ListItem;
