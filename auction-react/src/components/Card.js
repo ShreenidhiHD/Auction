@@ -108,7 +108,7 @@ const BiddingCard = ({ item }) => {
     }
   };
   const imageURL = `http://localhost:8000/images/${item.image_url.substring(item.image_url.lastIndexOf('/') + 1)}`;
-
+  
   return (
     <Card>
       <Dialog
