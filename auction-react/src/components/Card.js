@@ -23,6 +23,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import CardMedia from '@mui/material/CardMedia';
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 
 const BidButton = styled(Button)`
@@ -220,8 +221,11 @@ const BiddingCard = ({ item }) => {
   </CardContent>
 
   <CardActions disableSpacing>
-    <Button variant="contained" color="primary" onClick={handleBidClick}>
+    {/* <Button variant="contained" color="primary" onClick={handleBidClick}>
       Place Bid
+    </Button> */}
+     <Button variant="contained" color="primary" component={Link} to={`/viewauction/${item.id}/${item.product_name}`}>
+      View
     </Button>
   </CardActions>
 

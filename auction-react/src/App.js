@@ -14,6 +14,7 @@ import SettingsProvider from './server/SettingsProvider';
 import ForgetPassword from './pages/ForgetPassword';
 import CompleteProfile from './pages/User/CompleteProfile';
 import ListItem from './pages/User/ListItem';
+import ViewAuction from './pages/User/ViewAuction';
 // The App component wraps the entire application and sets up routing for all pages.
 // It also provides settings to all components using the SettingsProvider.
 function App() {
@@ -34,7 +35,7 @@ function App() {
             <Route path="/userprofile" element={<AuthenticatedRoute><UserProfile /></AuthenticatedRoute>} />
             <Route path="/listitem" element={<AuthenticatedRoute><ListItem /></AuthenticatedRoute>} />
             <Route path="/dashboard" element={<AuthenticatedRoute><Dashboard /></AuthenticatedRoute>} />
-           
+            <Route path="/viewauction/:id/:product_name" element={<AuthenticatedRoute><ViewAuction /></AuthenticatedRoute>} />
             <Route path="/completeprofile" element={<AuthenticatedRoute skipProfileCheck><CompleteProfile /></AuthenticatedRoute>} />
 
           </Routes>
