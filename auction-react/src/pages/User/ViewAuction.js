@@ -93,7 +93,13 @@ const ViewAuction = () =>{
                         <AuctionCardData auctionData={auction} />
                     </Grid>
                     <Grid item xs={12} md={2} >
-                        <BidderForm auctionData={auction}  onNewBid={fetchBids}/>
+                                
+                    {auction.currentUserId !== 0 && (
+    <BidderForm auctionData={auction} onNewBid={fetchBids} />
+)}
+
+        
+
                     </Grid>
                 </React.Fragment>
             ))}

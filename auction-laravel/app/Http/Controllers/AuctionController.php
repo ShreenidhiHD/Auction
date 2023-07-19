@@ -233,6 +233,9 @@ class AuctionController extends Controller
                 $winnerName = ucfirst($winnerUser->name);
             }    
        }
+        $currentUserId = $user->id;
+        $users = User::where('id', $auctions->created_by)->first();
+        $currentUserId = $users->id === $user->id ? 0 : 1;        
         $result="";
         if($auctions->winner==$user->id){ $result='You won the auction'; }
         else{ $result='Better luck next time'; }
@@ -259,6 +262,7 @@ class AuctionController extends Controller
             'status' => ucfirst($auctions->status),
             'winner' => $winnerName,
             'result'=> ucfirst($result),
+            'currentUserId' => $currentUserId,
         ];
         
         return response()->json([
