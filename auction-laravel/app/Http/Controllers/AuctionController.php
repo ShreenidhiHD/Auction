@@ -221,7 +221,8 @@ class AuctionController extends Controller
         
         $rows = $auctions->map(function($auction) {
             $users=User::where('id',$auction->created_by)->first();
-            $winner=User::where('id',$auction->winner)->first();
+            $winner='';
+            if($auction->winner!=''){ $winner=User::where('id',$auction->winner)->first(); }
             $result="";
             if($auction->winner==$user->id){ $result='You won the auction'; }
             else{ $result='Better luck next time'; }
@@ -333,6 +334,10 @@ class AuctionController extends Controller
         $delivery=AuctionModel::where('id',$request->id)->first();
 
         if($delivery->delivery_status=='delivered'){ return response()->json(['error' => 'Product is already delivered to winner of the auction.'], 401); }
+
+        if($delivery->delivery_status=='verified'){ return response()->json(['error' => 'This account is not authorised for this operation.'], 401); }
+
+        if($delivery->delivery_status=='delivered'){ return response()->json(['error' => 'This account is not authorised for this operation.'], 401); }
 
         $auction=AuctionModel::find($request->id);
 

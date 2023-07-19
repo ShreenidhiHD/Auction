@@ -222,7 +222,8 @@ class AdminController extends Controller
         
         $rows = $auctions->map(function($auction) {
             $users=User::where('id',$auction->created_by)->first();
-            $winner=User::where('id',$auction->winner)->first();
+            $winner='';
+            if($auction->winner!=''){ $winner=User::where('id',$auction->winner)->first(); }
             $result="";
             if($auction->winner==""){ $result="Not announced"; }
             if($auction->winner==$user->id){ $result='You won the auction'; }
@@ -350,5 +351,71 @@ class AdminController extends Controller
 
         if($user){ return response()->json(['message' => 'Manager account added successfully.'], 200); }
         else{ return response()->json(['error' => 'Unable to create manager account! Try again.'], 401); }
+    }
+
+    public function managers(){
+        $user=$request->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        
+        if(!$this->is_admin($user->id)){ return response()->json(['error' => 'Unauthorised access'], 401); }
+
+        $users=User::where(['role'=>'manager','status'=>'active'])->get();
+
+        // Structure the data as needed for the frontend
+        $columns = [
+            ['field' => 'id', 'headerName' => 'ID'],
+            ['field' => 'name', 'headerName' => 'Name'],
+            ['field' => 'email', 'headerName' => 'E-Mail'],
+            ['field' => 'mobile', 'headerName' => 'Mobile'],
+            ['field' => 'whatsapp', 'headerName' => 'Whatsapp'],
+            ['field' => 'address', 'headerName' => 'Address'],
+            ['field' => 'pincode', 'headerName' => 'Pincode'],
+            ['field' => 'status', 'headerName' => 'Status'],
+            ['field' => 'role', 'headerName' => 'Role'],
+            ['field' => 'created_at', 'headerName' => 'Created At'],
+        ];
+
+        $rows = $users->map(function($usr) {
+            return [
+                'id' => $usr->id,
+                'name'=>ucfirst($usr->name),
+                'email' => ucfirst($usr->email),
+                'mobile' =>  ucfirst($usr->mobile),
+                'whatsapp' => ucfirst($usr->whatsapp),
+                'address' => ucfirst($usr->address),
+                'pincode' => $usr->pincode,
+                'status' => ucfirst($usr->status),
+                'role' => ucfirst($usr->role),
+                'created_at' => date_format(date_create($usr->created_at),'d-m-Y'),
+            ];
+        });
+
+        return response()->json([
+            'columns' => $columns,
+            'rows' => $rows
+        ]);
+    }
+
+    public function assign_to_manager($auction_id,$manager_id){
+        //Check if manager is valid
+        $manager=User::where('id',$manager_id)->first();
+        if($manager->role!='manager' or $manager->status!='active'){ return response()->json(['error' => 'Selected user is not active or not manager.'], 401); }
+
+        //Check if auction do not have manager
+        $auction=AuctionModel::where('id',$auction_id)->first();
+        if($auction->status!='active' or $auction->manager!='' or $auction->delivery_status!='assigned'){ return response()->json(['error' => 'Selected auction is not active or manager is already assigned.'], 401); }
+
+        //Assign manager
+        $status=AuctionModel::find($auction_id);
+
+        $status->delivery_status='assigned';
+        $status->manager=$manager_id;
+
+        $results=$status->save();
+
+        if($results){ return response()->json(['message' => 'Manager assigned successfully.'], 200); }
+        else{ return response()->json(['error' => 'Unable to assign manager! Try again.'], 401); }
     }
 }
