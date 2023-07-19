@@ -104,7 +104,7 @@ class BidsController extends Controller
             return response()->json(['error' => 'Unable to bid! Try again'], 401);
         }
     }
-   }
+   
 
 
     public function read(Request $request, $auction_id){
