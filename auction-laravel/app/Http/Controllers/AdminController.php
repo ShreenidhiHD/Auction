@@ -216,6 +216,7 @@ class AdminController extends Controller
             $users=User::where('id',$auction->created_by)->first();
             $winner=User::where('id',$auction->winner)->first();
             $result="";
+            if($auction->winner==""){ $result="Not announced"; }
             if($auction->winner==$user->id){ $result='You won the auction'; }
             else{ $result='Better luck next time'; }
             $image_name=Array();
