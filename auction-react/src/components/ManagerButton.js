@@ -6,7 +6,7 @@ const ManagerButton = () => {
   return (
     <Button
       component={RouterLink}
-      to="/ManagerDashboard"
+      to="/AssignedTasks"
       sx={{ mx: 2, color: 'white' }}
     >
       Manager

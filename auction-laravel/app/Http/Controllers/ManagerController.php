@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -27,8 +28,18 @@ class ManagerController extends Controller
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
-        $auctions=AuctionModel::where(['status'=>'assigned','manager'=>$user->id])->get();
-
+        // $auctions=AuctionModel::where(['status'=>'assigned','manager'=>$user->id])->get();
+        $auctions = AuctionModel::where([
+            'status' => 'Active',
+            'manager' => $user->id
+        ])
+            ->where('delivery_status', '!=', 'pending')
+            ->get();
+        
+        
+        if ($auctions->isEmpty()) {
+            Log::warning('No auctions found for the specified conditions');
+        }
         // Structure the data as needed for the frontend
         $columns = [
             ['field' => 'id', 'headerName' => 'ID'],
@@ -95,7 +106,7 @@ class ManagerController extends Controller
         ]);
     }
 
-    public function update_auction($auction_id,$status){
+    public function update_auction(Request $request,$auction_id,$status){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -104,7 +115,7 @@ class ManagerController extends Controller
         if(!$this->is_manager($user->id)){ return response()->json(['error' => 'Unauthorised access'], 401); }
 
         $auctions=AuctionModel::where('id',$auction_id)->first();
-        if($auctions->status=='delivered'){ return response()->json(['error' => 'Product is already deliverd to bidder'], 401); }
+        if($auctions->delivery_status=='delivered'){ return response()->json(['error' => 'Product is already deliverd to bidder'], 401); }
 
         if($status=='verified' or $status=='shipped' or $status=='delivered'){
             $auction=AuctionModel::find($auction_id);
@@ -118,4 +129,6 @@ class ManagerController extends Controller
         }
         else{ return response()->json(['error' => 'Unauthorised operation'], 401); }
     }
+   
+
 }
