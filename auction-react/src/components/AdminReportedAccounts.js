@@ -1,0 +1,1 @@
+const AdminReportedAccounts = () => <h1>Reported Accounts</h1>;

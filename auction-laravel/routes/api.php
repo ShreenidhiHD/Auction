@@ -41,10 +41,11 @@ Route::post('/reset-password', [UserController::class, 'resetPassword']);
 //Auction routes
 Route::middleware('auth:sanctum')->post('/create_auction',[AuctionController::class, 'create']); //To create new auctions (auction_name,product_name,start_date,end_date,start_price,product_description,product_category,product_certification,status are required)
 Route::middleware('auth:sanctum')->get('/show_auction',[AuctionController::class, 'read']); //To display all auctions
-Route::middleware('auth:sanctum')->post('/update_auction',[AuctionController::class, 'update']); //Updates auction details (auction_name,product_name,start_date,end_date,start_price,product_description,product_category,product_certification,status are required)
+Route::middleware('auth:sanctum')->post('/update_auction/{id}',[AuctionController::class, 'update']); //Updates auction details (auction_name,product_name,start_date,end_date,start_price,product_description,product_category,product_certification,status are required)
 Route::middleware('auth:sanctum')->get('/delete_auction/{id}',[AuctionController::class, 'delete']); //Auction status set to inactive (send auction_id to this route)
 Route::middleware('auth:sanctum')->get('/result_page/{id}',[AuctionController::class, 'read_by_id']); //Auction details and winner details are returned here 
 Route::middleware('auth:sanctum')->get('/my_auctions/{user_id}',[AuctionController::class, 'read_by_user_id']); //My_auctions page
+Route::middleware('auth:sanctum')->get('/my_auctionslist',[AuctionController::class, 'userauctions']); //My_auctions page
 Route::middleware('auth:sanctum')->post('/announce_winner',[AuctionController::class, 'update_winner']); //To update winner of the auction manually (If incase needed you can use this route) needs $request->id(auction_id) and $request->winner(user_id of winner) as inputs
 Route::middleware('auth:sanctum')->post('/update_delivery_status',[AuctionController::class, 'update_delivery_status']); //Can update auction status (allowed status are pending and shipped)
 Route::middleware('auth:sanctum')->get('/report_auction/{auction_id}',[AuctionController::class, 'report_auction']); //Call this route when user clicks on report button
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->post('/create_bid',[BidsController::class, 'c
 Route::middleware('auth:sanctum')->get('/show_bids/{auction_id}',[BidsController::class, 'read']); //Display all the bids of all the users for specific auction
 Route::middleware('auth:sanctum')->get('/show_bid/{bid_id}',[BidsController::class, 'read_by_id']); //Display specific bid
 Route::middleware('auth:sanctum')->get('/my_participation/{user_id}',[BidsController::class, 'read_by_user_id']); //my_participation page
+Route::middleware('auth:sanctum')->get('/my_participations',[BidsController::class, 'read_by_user']); //my_participation page
 Route::middleware('auth:sanctum')->get('/delete_bid/{bid_id}',[BidsController::class, 'delete']); //Deletes the bid from database (Actual delete)
 
 //Admin routes

@@ -220,7 +220,56 @@ class BidsController extends Controller
         ]);
     }
 
-    public function delete($bid_id){
+
+  
+
+public function read_by_user(Request $request){
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    $user_id = $user->id;
+    $bids = BidsModel::where('bidder', $user_id)->get();
+
+    // Structure the data as needed for the frontend
+    $columns = [
+        ['field' => 'id', 'headerName' => 'ID'],
+        ['field' => 'auction_name', 'headerName' => 'Auction Name'],
+        ['field' => 'created_by', 'headerName' => 'Created By'],
+        ['field' => 'start_date', 'headerName' => 'Start Date'],
+        ['field' => 'product_name', 'headerName' => 'Product'],
+        ['field' => 'end_date', 'headerName' => 'End Date'],
+        ['field' => 'price', 'headerName' => 'My Bid'],
+        ['field' => 'winner', 'headerName' => 'Winner'],
+        ['field' => 'winning_bid', 'headerName' => 'Winning Bid'],
+    ];
+
+    $rows = $bids->map(function($bid) {
+        $users = User::where('id', $bid->bidder)->first();
+        $auction = AuctionModel::where('id', $bid->auction_id)->first();
+        $winner = User::where('id', $auction->winner)->first();
+        $winning = BidsModel::where(['auction_id' => $bid->auction_id, 'bidder' => $auction->winner])->latest()->first();
+        return [
+            'id' => $bid->id,
+            'auction_name' => ucfirst($auction->auction_name),
+            'created_by' => ucfirst($users->name),
+            'start_date' => date_format(date_create($bid->start_date), 'd-m-Y'),
+            'end_date' => date_format(date_create($bid->end_date), 'd-m-Y'),
+            'product_name' => ucfirst($bid->product_name),
+            'price' => number_format($bid->price, 2),
+            'winner' => ($winner) ? ucfirst($winner->name) : null,
+            'winning_bid' => ($winning) ? number_format($winning->price, 2) : null,
+        ];
+    });
+
+    return response()->json([
+        'columns' => $columns,
+        'rows' => $rows
+    ]);
+}
+
+    public function delete(Request $request,$bid_id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);

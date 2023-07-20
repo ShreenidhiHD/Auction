@@ -11,6 +11,7 @@ import Logout from './Logout';
 import SellButton from './SellButton';
 import DashboardButton from './DashboardButton';
 import AdminButton from './AdminButton';
+import ManagerButton from './ManagerButton';
 
 
 const ResponsiveAppBar = () => {
@@ -109,6 +110,8 @@ const ResponsiveAppBar = () => {
           {userRole === 'admin' && <AdminButton/>} {/* hypothetical AdminButton component */}
           <DashboardButton/>
           {userRole !== 'charity' && <SellButton/>}
+          {userRole === 'manager' && <ManagerButton/>} {/* hypothetical ManagerButton component */}
+
           <Logout onLogout={handleLogout} />
         </>
       )}

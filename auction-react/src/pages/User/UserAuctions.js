@@ -2,8 +2,10 @@ import DataTable from '../../components/DataTable';
 import React, { useState, useEffect } from 'react';
 import { Container, Card, CardContent } from '@mui/material';
 import axios from 'axios';
+import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
-const UserDonations = () => {
+const UserAuctions = () => {
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
 
@@ -19,7 +21,7 @@ const UserDonations = () => {
         return;
       }
   
-      const response = await axios.get('http://localhost:8000/api/user-donations', {
+      const response = await axios.get('http://localhost:8000/api/my_auctionslist', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -31,17 +33,32 @@ const UserDonations = () => {
       console.error('Error fetching data:', error);
     }
   };
-
+  const actionButton = (row) => {
+    if (row.status ==='inactive'){
+      return 'Deactivated By Admin'
+    }
+    else{
+      return   <div style={{ display: 'flex', gap: '8px' }}>
+        <Button variant="contained" size="small" component={Link} to={`/auctions/update_auction/${row.id}`}>
+          View
+        </Button>
+        <Button variant="contained" size="small" color="primary" component={Link} to={`/auction/bids/${row.id}/${row.auction_name}`}>
+         Bids
+        </Button>
+      </div>
+      
+    }
+  }
   return (
     <Container sx={{ marginTop: '2rem' }}>
       <Card>
         <CardContent>
-            <h1 className='text-center'>My Donations</h1>
-          <DataTable columns={columns} rows={rows} />
+            <h1 className='text-center'>My Auction listings</h1>
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
         </CardContent>
       </Card>
     </Container>
   );
 };
 
-export default UserDonations;
+export default UserAuctions;

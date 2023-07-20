@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
-const DataTable = ({ columns, rows, actionButton, detailPageLink, actionButtonText}) => {
+const DataTable = ({ columns, rows, actionButton = () => {}, detailPageLink, actionButtonText }) => {
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,7 +114,7 @@ const DataTable = ({ columns, rows, actionButton, detailPageLink, actionButtonTe
                 </TableSortLabel>
               </TableCell>
             ))}
-            <TableCell>Action</TableCell>
+              {actionButtonText && <TableCell>Action</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>

@@ -94,9 +94,14 @@ const ViewAuction = () =>{
                     </Grid>
                     <Grid item xs={12} md={2} >
                                 
-                    {auction.currentUserId !== 0 && (
-    <BidderForm auctionData={auction} onNewBid={fetchBids} />
-)}
+                    {
+                    auction.winner 
+                    ? <div>Winner Announced: {auction.winner}<br/>
+                    {auction.result}
+                    </div> 
+                    : auction.currentUserId !== 0 && <BidderForm auctionData={auction} onNewBid={fetchBids} />
+                    }
+
 
         
 

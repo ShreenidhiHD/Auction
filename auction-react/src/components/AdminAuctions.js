@@ -1,0 +1,1 @@
+const AdminAuctions = () => <h1>Auctions</h1>;
