@@ -6,9 +6,7 @@ const drawerWidth = 240;
 const AppDrawer = styled(Drawer)(({ theme }) => ({
   width: drawerWidth,
   flexShrink: 0,
-  position: 'absolute',
-  top: '64px',  // Update this value to match the height of your Navbar
-  height: 'calc(100% - 64px)', // This will make the sidebar span the rest of the page height
+  marginTop: '25px',
   '& .MuiDrawer-paper': {
     width: drawerWidth,
     boxSizing: 'border-box',
