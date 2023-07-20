@@ -69,7 +69,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function update_user($user_id,$status){
+    public function update_user(Request $request,$user_id,$status){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -87,7 +87,7 @@ class AdminController extends Controller
         else{ return response()->json(['error' => 'Unable to update user! Try again.'], 401); }
     }
 
-    public function auctions(){
+    public function auctions(Request $request){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -120,8 +120,8 @@ class AdminController extends Controller
             $winner=User::where('id',$auction->winner)->first();
             return [
                 'id' => $auction->id,
-                'created_by' => ucfirst($users->name),
-                'auction_name' =>  ucfirst($auction->event_name),
+                'created_by' => $users ? ucfirst($users->name) : 'N/A',
+                'auction_name' =>  ucfirst($auction->auction_name),
                 'product_name' => ucfirst($auction->product_name),
                 'start_date' => date_format(date_create($auction->start_date),'d-m-Y'),
                 'end_date' => date_format(date_create($auction->end_date),'d-m-Y'),
@@ -131,10 +131,11 @@ class AdminController extends Controller
                 'product_certification' => ucfirst($auction->product_certification),
                 'delivery_status' => ucfirst($auction->delivery_status),
                 'status' => ucfirst($auction->status),
-                'winner' =>  ucfirst($winner->name),
+                'winner' =>  $winner ? ucfirst($winner->name) : 'N/A',
                 'created_at' => date_format(date_create($auction->created_at),'d-m-Y'),
             ];
         });
+        
     
         return response()->json([
             'columns' => $columns,
@@ -142,7 +143,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function update_auction($auction_id,$status){
+    public function update_auction(Request $request,$auction_id,$status){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -353,7 +354,7 @@ class AdminController extends Controller
         else{ return response()->json(['error' => 'Unable to create manager account! Try again.'], 401); }
     }
 
-    public function managers(){
+    public function managers(Request $request){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
@@ -361,8 +362,8 @@ class AdminController extends Controller
         
         if(!$this->is_admin($user->id)){ return response()->json(['error' => 'Unauthorised access'], 401); }
 
-        $users=User::where(['role'=>'manager','status'=>'active'])->get();
-
+        // $users=User::where(['role'=>'manager','status'=>'active'])->get();
+        $users=User::where(['role'=>'manager'])->get();
         // Structure the data as needed for the frontend
         $columns = [
             ['field' => 'id', 'headerName' => 'ID'],
@@ -397,25 +398,71 @@ class AdminController extends Controller
             'rows' => $rows
         ]);
     }
-
-    public function assign_to_manager($auction_id,$manager_id){
-        //Check if manager is valid
-        $manager=User::where('id',$manager_id)->first();
-        if($manager->role!='manager' or $manager->status!='active'){ return response()->json(['error' => 'Selected user is not active or not manager.'], 401); }
-
-        //Check if auction do not have manager
-        $auction=AuctionModel::where('id',$auction_id)->first();
-        if($auction->status!='active' or $auction->manager!='' or $auction->delivery_status!='assigned'){ return response()->json(['error' => 'Selected auction is not active or manager is already assigned.'], 401); }
-
-        //Assign manager
-        $status=AuctionModel::find($auction_id);
-
-        $status->delivery_status='assigned';
-        $status->manager=$manager_id;
-
-        $results=$status->save();
-
-        if($results){ return response()->json(['message' => 'Manager assigned successfully.'], 200); }
-        else{ return response()->json(['error' => 'Unable to assign manager! Try again.'], 401); }
+    public function managerslist(Request $request){
+        $user=$request->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        
+        if(!$this->is_admin($user->id)){ return response()->json(['error' => 'Unauthorised access'], 401); }
+    
+        $users=User::where(['role'=>'manager','status'=>'active'])->get();
+      
+        // Create an array with just the managers' ids and names
+        $managers = $users->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name'=>ucfirst($user->name),
+            ];
+        });
+    
+        return response()->json([
+            'managers' => $managers
+        ]);
     }
+    
+    public function assign_to_manager($auction_id, $manager_id)
+{
+    // Check if manager is valid
+    $manager = User::where('id', $manager_id)->first();
+    
+    if ($manager->role !== 'manager') {
+        Log::error('Selected user is not a manager. Role: ' . $manager->role);
+        return response()->json(['error' => 'Selected user is not a manager.'], 401);
+    }
+
+    if ($manager->status !== 'Active') {
+        Log::error('Selected user is not active. Status: ' . $manager->status);
+        return response()->json(['error' => 'Selected user is not active.'], 401);
+    }
+
+    // Check if auction does not have a manager
+    $auction = AuctionModel::where('id', $auction_id)->first();
+
+    if ($auction->status !== 'active') {
+        Log::error('Selected auction is not active. Status: ' . $auction->status);
+        return response()->json(['error' => 'Selected auction is not active.'], 401);
+    }
+
+    if ($auction->manager !== null || $auction->delivery_status == 'manager') {
+        Log::error('Selected auction already has a manager assigned.');
+        return response()->json(['error' => 'Selected auction already has a manager assigned.'], 401);
+    }
+
+    // Assign manager
+    $status = AuctionModel::find($auction_id);
+
+    $status->delivery_status = 'assigned';
+    $status->manager = $manager_id;
+
+    $results = $status->save();
+
+    if ($results) {
+        return response()->json(['message' => 'Manager assigned successfully.'], 200);
+    } else {
+        return response()->json(['error' => 'Unable to assign manager! Try again.'], 401);
+    }
+}
+
+    
 }

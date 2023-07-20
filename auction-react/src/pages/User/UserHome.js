@@ -6,7 +6,7 @@ import { SettingsContext } from '../../server/SettingsProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/Home.css';
 import axios from 'axios';
-import RecipeReviewCard from '../../components/Card';
+import BiddingCard from '../../components/Card';
 
 const UserHome = () => {
   const settings = useContext(SettingsContext);
@@ -48,7 +48,7 @@ const UserHome = () => {
           <Grid container spacing={2} justifyContent="center">
   {data.map((item, index) => (
     <Grid item xs={12} sm={6} md={4} key={index}>
-      <RecipeReviewCard item={item} />
+      <BiddingCard item={item} />
     </Grid>
   ))}
 </Grid>
