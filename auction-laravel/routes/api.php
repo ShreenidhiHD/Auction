@@ -37,7 +37,7 @@ Route::get('/user/is-profile-complete', [UserController::class, 'isProfileComple
 // Route to fetch application settings
 Route::get('/settings', [SettingsController::class, 'getSettings']);
 Route::post('/reset-password', [UserController::class, 'resetPassword']);
-
+Route::get('/show_auctionhome',[AuctionController::class, 'showauction']);
 //Auction routes
 Route::middleware('auth:sanctum')->post('/create_auction',[AuctionController::class, 'create']); //To create new auctions (auction_name,product_name,start_date,end_date,start_price,product_description,product_category,product_certification,status are required)
 Route::middleware('auth:sanctum')->get('/show_auction',[AuctionController::class, 'read']); //To display all auctions
@@ -60,9 +60,9 @@ Route::middleware('auth:sanctum')->get('/delete_bid/{bid_id}',[BidsController::c
 
 //Admin routes
 Route::middleware('auth:sanctum')->get('/admin/users',[AdminController::class, 'view_users']); //List of users
-Route::middleware('auth:sanctum')->get('/admin/users_update/{user_id}/{status}',[AdminController::class, 'update_user']); //To update user status
+Route::middleware('auth:sanctum')->patch('/admin/users_update/{user_id}/{status}',[AdminController::class, 'update_user']); //To update user status
 Route::middleware('auth:sanctum')->get('/admin/auctions',[AdminController::class, 'auctions']); //List of auctions
-Route::middleware('auth:sanctum')->get('/admin/auctions_update/{auction_id}/{status}',[AdminController::class, 'update_auction']); //To update auction status
+Route::middleware('auth:sanctum')->patch('/admin/auctions_update/{auction_id}/{status}',[AdminController::class, 'update_auction']); //To update auction status
 Route::middleware('auth:sanctum')->get('/admin/bids/{auction_id}',[AdminController::class, 'bids']); //List of bids by auction id
 Route::middleware('auth:sanctum')->get('/admin/auction_by_id/{id}',[AdminController::class, 'read_by_id']); //To view indivisual auctions
 Route::middleware('auth:sanctum')->get('/admin/reported_auctions',[AdminController::class, 'reported_auctions']); //List of reported auctions
@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->get('/admin/reported_auctions_update/{auction
 Route::middleware('auth:sanctum')->post('/admin/create_manager',[AdminController::class, 'create_manager']); //Create new manager (name,email are required)
 Route::middleware('auth:sanctum')->get('/admin/managers_list',[AdminController::class, 'managers']); //Manager list to show in assign manager to auction page
 Route::middleware('auth:sanctum')->get('/admin/assign_manager/{auction_id}/{manager_id}',[AdminController::class, 'assign_to_manager']); //Assign the manager to the auction
-
+Route::middleware('auth:sanctum')->get('/admin/managerslist',[AdminController::class, 'managerslist']); //Manager list to show in assign manager to auction page
 //Manager routes
 Route::middleware('auth:sanctum')->get('/manager/assigned_auctions',[ManagerController::class, 'read']); //To display auctions assigned to manager (Manager home page)
 Route::middleware('auth:sanctum')->get('/manager/verify/{auction_id}/{status}',[ManagerController::class, 'update_auction']); //Update the auction status (status allowed are rejected)

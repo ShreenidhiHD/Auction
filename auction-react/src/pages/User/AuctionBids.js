@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 const AuctionBids = () => {
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
-  const { id ,auctionname } = useParams(); 
+  const { id ,auction_name } = useParams(); 
   
   useEffect(() => {
     fetchData();
@@ -55,7 +55,7 @@ const AuctionBids = () => {
     <Container sx={{ marginTop: '2rem' }}>
       <Card>
         <CardContent>
-            <h1 className='text-center'>My Auction listings</h1>
+            <h1 className='text-center'>{auction_name}</h1>
             <DataTable columns={columns} rows={rows}  />
         </CardContent>
       </Card>
