@@ -431,7 +431,7 @@ class AdminController extends Controller
         return response()->json(['error' => 'Selected user is not a manager.'], 401);
     }
 
-    if ($manager->status !== 'Active') {
+    if (strtolower($manager->status) !== 'active') {
         Log::error('Selected user is not active. Status: ' . $manager->status);
         return response()->json(['error' => 'Selected user is not active.'], 401);
     }
