@@ -178,9 +178,13 @@ const searchableFields = ["created_by", "auction_name", "product_name"];
     if (row.status === 'Active' || row.status === 'Verified') {
       return (
         <div style={{ display: 'flex', gap: '8px' }}>
-          <Button variant="contained" size="small" component={Link} onClick={() => handleDeactivateClick(row)}>
+           {row.delivery_status === 'Delivered' ? (
+          <div>Completed</div>
+          ) : (
+            <Button variant="contained" size="small" component={Link} onClick={() => handleDeactivateClick(row)}>
             Deactivate
           </Button>
+            )}
           <Button variant="contained" size="small" color="primary" component={Link} to={`/auction/bids/${row.id}/${row.auction_name}`}>
             Bids
           </Button>
