@@ -14,4 +14,8 @@ class auction_images extends Model
     protected $fillable = ['auction_id', 'image_path'];
 
     public $timestamps = false;
+    public function auction()
+    {
+        return $this->belongsTo(AuctionModel::class, 'auction_id');
+    }
 }

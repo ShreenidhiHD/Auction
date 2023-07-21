@@ -11,6 +11,7 @@ import Logout from './Logout';
 import SellButton from './SellButton';
 import DashboardButton from './DashboardButton';
 import AdminButton from './AdminButton';
+import ManagerButton from './ManagerButton';
 
 
 const ResponsiveAppBar = () => {
@@ -22,7 +23,7 @@ const ResponsiveAppBar = () => {
   const restrictedPages = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+   
     { name: 'Login', path: '/login' },
     { name: 'Signup', path: '/signup' },
   ];
@@ -30,7 +31,6 @@ const ResponsiveAppBar = () => {
   const unrestrictedPages = [
     { name: 'Home', path: '/UserHome' },
     { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
     { name: 'Profile', path: '/UserProfile' },
    
   ];
@@ -109,6 +109,8 @@ const ResponsiveAppBar = () => {
           {userRole === 'admin' && <AdminButton/>} {/* hypothetical AdminButton component */}
           <DashboardButton/>
           {userRole !== 'charity' && <SellButton/>}
+          {userRole === 'manager' && <ManagerButton/>} {/* hypothetical ManagerButton component */}
+
           <Logout onLogout={handleLogout} />
         </>
       )}

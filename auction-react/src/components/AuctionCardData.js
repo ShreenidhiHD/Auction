@@ -56,7 +56,7 @@ const AuctionCardData = ({ auctionData }) => {
                     Status: {auctionData.status}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Winner: {auctionData.winner}
+                    Winner: {auctionData.winner ? auctionData.winner : "Not announced yet"}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     Result: {auctionData.result}
