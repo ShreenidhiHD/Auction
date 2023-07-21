@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\File;
 
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -381,13 +382,13 @@ public function showauction()
         'product_category' => 'required|string',
         'product_certification' => 'required|string',
         'status' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+       
     ]);
 
     if (Carbon::parse($validated['end_date'])->lte(Carbon::parse($validated['start_date']))) {
         return response()->json(['error' => 'End date must be greater than start date.'], 400);
     }
-
+   
     // Retrieve the auction
     $auction = AuctionModel::find($id);
     if (!$auction) {
@@ -406,26 +407,24 @@ public function showauction()
     $auction->status = $validated['status'];
 
     // Handle image upload if provided
+    // Handle image upload if provided
     if ($request->hasFile('image')) {
-        // Delete the old image
-        Storage::delete('public/images/' . $auction->image_path);
-
-        // Upload the new image
         $image = $request->file('image');
         $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $image->storeAs('public/images', $imageName);
-        $auction->image_path = $imageName;
-    }
+        $image->move(public_path('images'), $imageName);
 
-    // Save the updated auction
-    $status = $auction->save();
+        // Update the image path in the auction_images table
+        $upload_status = auction_images::where('auction_id', $id)->update(['image_path' => $imageName]);
 
-    if ($status) {
-        return response()->json(['message' => 'Auction updated successfully.'], 200);
-    } else {
-        return response()->json(['error' => 'Unable to update auction! Try again.'], 401);
+        if(!$upload_status) {
+            return response()->json(['error' => 'Unable to update image! Try again.'], 401);
+        }
     }
-}
+     // Save the updated auction
+     $auction->save();
+     return response()->json(['message' => 'Auction updated successfully.'], 200); 
+} 
+    
     
 
     public function delete(Request $request,$id){
