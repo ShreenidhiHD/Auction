@@ -24,5 +24,6 @@ class AuctionModel extends Model
         'delivery_status',
         'status',
         'winner',
+        'manager',
     ];
 }

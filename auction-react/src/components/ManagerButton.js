@@ -2,16 +2,16 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import { Link as RouterLink } from 'react-router-dom';
 
-const AdminButton = () => {
+const ManagerButton = () => {
   return (
     <Button
       component={RouterLink}
-      to="/AdminDashboard"
-      sx={{ mx: 2, color: 'inherit' }}
+      to="/AssignedTasks"
+      sx={{ mx: 2, color: 'white' }}
     >
-      Admin
+      Manager
     </Button>
   );
 };
 
-export default AdminButton;
+export default ManagerButton;
