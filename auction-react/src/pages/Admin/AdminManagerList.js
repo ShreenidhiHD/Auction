@@ -128,7 +128,7 @@ const AdminManagerList = () => {
       <Card>
         <CardContent>
             <h1 className='text-center'>Managers </h1>
-            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} searchableFields={['name','email']}/>
         </CardContent>
       </Card>
       <ToastContainer position="top-center" />

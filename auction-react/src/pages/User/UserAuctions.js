@@ -54,7 +54,7 @@ const UserAuctions = () => {
       <Card>
         <CardContent>
             <h1 className='text-center'>My Auction listings</h1>
-            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} searchableFields={['created_by', 'auction_name']}/>
         </CardContent>
       </Card>
     </Container>

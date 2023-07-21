@@ -473,22 +473,26 @@ public function showauction()
             ['field' => 'result', 'headerName' => 'Result'],
         ];
        
-        $users=User::where('id',$auctions->created_by)->first();
-       $winnerName = null;
-       if ($auctions->winner != null) {
-        $winnerUser = User::where('id', $auctions->winner)->first();
+      
+        $winnerName = null;
+        $result = 'Result not yet announced';
+        if ($auctions->winner != null) {
+            $winnerUser = User::where('id', $auctions->winner)->first();
             if ($winnerUser) {
                 $winnerName = ucfirst($winnerUser->name);
+                if ($auctions->created_by == $user->id) {
+                    $result = 'Auction completed';
+                } else {
+                    $result = $auctions->winner == $user->id ? 'You won the auction' : 'Better luck next time';
+                }
             }    
-       }
+        }
+    
         $currentUserId = $user->id;
         $users = User::where('id', $auctions->created_by)->first();
         $currentUserId = $users->id === $user->id ? 0 : 1;        
-        $result="";
-        if($auctions->winner==$user->id){ $result='You won the auction'; }
-        else{ $result='Better luck next time'; }
         $images = auction_images::where('auction_id', $auctions->id)->first();
-
+    
         $image_name = "";
         if ($images) {
             $image_name = $images->image_path;
@@ -517,17 +521,15 @@ public function showauction()
             'columns' => $columns,
             'rows' => [$row]
         ]);
-        
     }
+    
 
     public function read_by_user_id($user_id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-
         $auctions=AuctionModel::where('created_by',$user_id)->get();
-
         // Structure the data as needed for the frontend
         $columns = [
             ['field' => 'id', 'headerName' => 'ID'],

@@ -128,7 +128,7 @@ const AdminUsers = () => {
       <Card>
         <CardContent>
             <h1 className='text-center'>Users</h1>
-            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} searchableFields={['name','email']}/>
         </CardContent>
       </Card>
       <ToastContainer position="top-center" />

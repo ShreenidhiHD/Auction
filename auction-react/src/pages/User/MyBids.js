@@ -83,7 +83,7 @@ const MyBids = () => {
       <Card>
         <CardContent>
             <h1 className='text-center'>My Participation</h1>
-            <DataTable columns={columns} rows={rows}  actionButton={actionButton} actionButtonText="Action" />
+            <DataTable columns={columns} rows={rows}  actionButton={actionButton} actionButtonText="Action" searchableFields={['created_by', 'auction_name']}/>
         </CardContent>
       </Card>
       <ToastContainer position="top-center" />

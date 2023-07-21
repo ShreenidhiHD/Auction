@@ -56,7 +56,7 @@ const handleClose = () => {
         console.error('Failed to assign manager:', error);
     }
 };
-
+const searchableFields = ["created_by", "auction_name", "product_name"];
 
   const handleDeactivateClick = async (item) => {
     try {
@@ -208,7 +208,9 @@ const handleClose = () => {
             <div>Assigned</div>
           ) : (
             row.winner !== 'N/A' && (
-              <Button variant="contained" size="small" color="primary" onClick={() => handleOpen(row)}>
+              <Button variant="contained" size="small" color="primary" onClick={() => handleOpen(row)} searchableFields={[ "created_by",
+              "auction_name",
+              "product_name"]}>
                 Assign
               </Button>
             )
@@ -228,9 +230,10 @@ const handleClose = () => {
         <DialogTitle>Assign Manager</DialogTitle>
         <DialogContent>
         <Select value={selectedManager} onChange={(e) => setSelectedManager(e.target.value)}>
-  {managers?.length ? managers.map(manager => (
-    <MenuItem value={manager.id}>{manager.name}</MenuItem>
-  )) : <MenuItem>Loading...</MenuItem>}
+        {managers?.length ? managers.map((manager) => (
+  <MenuItem key={manager.id} value={manager.id}>{manager.name}</MenuItem>
+)) : <MenuItem>Loading...</MenuItem>}
+
 </Select>
 
 
@@ -240,9 +243,10 @@ const handleClose = () => {
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
+      
         <CardContent>
             <h1 className='text-center'>Auctions</h1>
-            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} searchableFields={searchableFields} />
         </CardContent>
         <ToastContainer position="top-center" />
       </Card>
