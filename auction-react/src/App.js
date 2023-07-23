@@ -26,6 +26,7 @@ import AdminManagerList from './pages/Admin/AdminManagerList';
 import AdminReportedAccounts from './pages/Admin/AdminReportedAccounts';
 import AdminCreateCreateManager from './pages/Admin/AdminCreateManager';
 import AssignedTasks from './pages/Manager/AssignedTasks';
+import WonAuctions from './pages/User/WonAuctions';
 
 
 // The App component wraps the entire application and sets up routing for all pages.
@@ -60,7 +61,7 @@ function App() {
             <Route path="/adminreportedaccounts" element={<AuthenticatedRoute><AdminReportedAccounts/></AuthenticatedRoute>} />
             <Route path="/admincreatemanager" element={<AuthenticatedRoute><AdminCreateCreateManager/></AuthenticatedRoute>} />
             <Route path="/adminusers" element={<AuthenticatedRoute><AdminUsers /></AuthenticatedRoute>} />
-
+            <Route path="/wonauctions" element={<AuthenticatedRoute><WonAuctions /></AuthenticatedRoute>} />
             <Route path="/assignedtasks" element={<AuthenticatedRoute><AssignedTasks/></AuthenticatedRoute>} />
             
           </Routes>

@@ -215,7 +215,7 @@ function UpdateAuction() {
       </Grid>
     <Grid item xs={12} container justifyContent="flex-end">
       <Button style={{ marginTop: '20px' }} variant="contained" sx={{ mr: 5, width: 200 }} color="primary" type="submit">
-        Create Auction
+        Update Auction
       </Button>
     </Grid>
   </Grid>
