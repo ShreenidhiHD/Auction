@@ -86,9 +86,9 @@ const CompleteProfile = () => {
           setTimeout(() => {
             setMessage('');
             setMessageType('');
-            navigate('/UserHome'); 
+            window.location.href = '/UserHome';
           }, 3000);
-
+          
         })
         .catch((error) => {
          setMessage('Failed to update profile');

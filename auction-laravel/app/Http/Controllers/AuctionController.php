@@ -11,6 +11,7 @@ use App\Models\auction_images;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use DB;
 
 class AuctionController extends Controller
 {
@@ -473,22 +474,26 @@ public function showauction()
             ['field' => 'result', 'headerName' => 'Result'],
         ];
        
-        $users=User::where('id',$auctions->created_by)->first();
-       $winnerName = null;
-       if ($auctions->winner != null) {
-        $winnerUser = User::where('id', $auctions->winner)->first();
+      
+        $winnerName = null;
+        $result = 'Result not yet announced';
+        if ($auctions->winner != null) {
+            $winnerUser = User::where('id', $auctions->winner)->first();
             if ($winnerUser) {
                 $winnerName = ucfirst($winnerUser->name);
+                if ($auctions->created_by == $user->id) {
+                    $result = 'Auction completed';
+                } else {
+                    $result = $auctions->winner == $user->id ? 'You won the auction' : 'Better luck next time';
+                }
             }    
-       }
+        }
+    
         $currentUserId = $user->id;
         $users = User::where('id', $auctions->created_by)->first();
         $currentUserId = $users->id === $user->id ? 0 : 1;        
-        $result="";
-        if($auctions->winner==$user->id){ $result='You won the auction'; }
-        else{ $result='Better luck next time'; }
         $images = auction_images::where('auction_id', $auctions->id)->first();
-
+    
         $image_name = "";
         if ($images) {
             $image_name = $images->image_path;
@@ -517,17 +522,15 @@ public function showauction()
             'columns' => $columns,
             'rows' => [$row]
         ]);
-        
     }
+    
 
     public function read_by_user_id($user_id){
         $user=$request->user();
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
-
         $auctions=AuctionModel::where('created_by',$user_id)->get();
-
         // Structure the data as needed for the frontend
         $columns = [
             ['field' => 'id', 'headerName' => 'ID'],
@@ -570,7 +573,12 @@ public function showauction()
             'rows' => $rows
         ]);
     }
- 
+
+    public function hasBids($auction_id){
+        $bids=BidsModel::where('auction_id',$auction_id)->count();
+        return $bids > 0;
+    }
+
   public function userauctions(Request $request){
     $user = $request->user();
     if (!$user) {
@@ -595,6 +603,7 @@ public function showauction()
         ['field' => 'delivery_status', 'headerName' => 'Delivery Status'],
         ['field' => 'status', 'headerName' => 'Status'],
         ['field' => 'winner', 'headerName' => 'Winner'],
+        ['field' => 'has_bids', 'headerName' => 'Has Bids'],
     ];
 
     $rows = $auctions->map(function($auction) {
@@ -614,6 +623,7 @@ public function showauction()
             'delivery_status' => ucfirst($auction->delivery_status),
             'status' => ucfirst($auction->status),
             'winner' => ($winner) ? ucfirst($winner->name) : null,
+            'has_bids' => $this->hasBids($auction->id) ? 'Yes' : 'No',
         ];
     });
 
@@ -622,6 +632,7 @@ public function showauction()
         'rows' => $rows
     ]);
 }
+
 
     public function update_winner(Request $request){
         $user=$request->user();
@@ -678,4 +689,104 @@ public function showauction()
         if($status){ return response()->json(['message' => 'Auction reported successfully.'], 200); }
         else{ return response()->json(['error' => 'Unable to report auction! Try again.'], 401); }
     }
+
+
+    public function wonAuctions(Request $request) {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+    
+        $auctions = AuctionModel::where('winner', $user->id)->get();
+    
+        // Structure the data as needed for the frontend
+        $columns = [
+            ['field' => 'id', 'headerName' => 'ID'],
+            ['field' => 'auction_name', 'headerName' => 'Auction Name'],
+            ['field' => 'product_name', 'headerName' => 'Product Name'],
+            ['field' => 'product_description', 'headerName' => 'Product Description'],
+            ['field' => 'product_category', 'headerName' => 'Product Category'],
+            ['field' => 'product_certification', 'headerName' => 'Product Certification'],
+            ['field' => 'delivery_status', 'headerName' => 'Delivery Status'],
+            ['field' => 'bid_amount', 'headerName' => 'Bid Amount']
+        ];
+    
+        $rows = $auctions->map(function($auction) use ($user) {
+            // Define the variables in the right scope
+            $auction_id = $auction->id;
+            $user_id = $user->id;
+    
+            $winningBid = DB::table('bids')
+            ->where('auction_id', $auction_id)
+            ->where('bidder', $user_id)
+            ->orderBy('price', 'desc') // order bids by price in descending order
+            ->first();
+        
+        
+            $bidAmount = $winningBid ? $winningBid->price : 'N/A';
+    
+            return [
+                'id' => $auction->id,
+                'auction_name' => ucfirst($auction->auction_name),
+                'product_name' => ucfirst($auction->product_name),
+                'product_description' => ucfirst($auction->product_description),
+                'product_category' => ucfirst($auction->product_category),
+                'product_certification' => ucfirst($auction->product_certification),
+                'delivery_status' => ucfirst($auction->delivery_status),
+                'bid_amount' => $bidAmount,
+            ];
+        });
+    
+        return response()->json([
+            'columns' => $columns,
+            'rows' => $rows
+        ]);
+    }
+    
+
+    public function withdrawBids($auctionId, Request $request)
+{
+    $user = $request->user();
+    if (!$user) {
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    // Check the delivery_status of the auction
+    $auction = AuctionModel::find($auctionId);
+    if ($auction->delivery_status !== 'pending') {
+        return response()->json(['error' => 'Bid withdrawal is not allowed for this auction.'], 400);
+    }
+
+    // Fetch all bids made by the user for the given auction
+    $bids = BidsModel::where('auction_id', $auctionId)
+        ->where('bidder', $user->id)
+        ->get();
+
+    if ($bids->isEmpty()) {
+        return response()->json(['error' => 'No bids found for this auction by the current user'], 404);
+    }
+
+    // Get the current winner (if any) before deleting bids
+    $currentWinner = BidsModel::where('auction_id', $auctionId)
+        ->where('bidder', '<>', $user->id)
+        ->orderBy('price', 'desc')
+        ->first();
+
+    // Delete all the bids
+    $deletedBidsCount = $bids->count();
+    $bids->each->delete();
+
+    // Update the winner of the auction if needed
+    if ($currentWinner) {
+        $auction->winner = $currentWinner->bidder;
+    } else {
+        // No other bidders, set the winner to null
+        $auction->winner = null;
+    }
+
+    $auction->save();
+
+    return response()->json(['message' => "$deletedBidsCount bid(s) withdrawn successfully"], 200);
+}
+
 }

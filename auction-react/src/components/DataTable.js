@@ -14,7 +14,8 @@ import {
 } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 
-const DataTable = ({ columns, rows, actionButton = () => {}, detailPageLink, actionButtonText }) => {
+const DataTable = ({ columns, rows, actionButton = () => {}, detailPageLink, actionButtonText, searchableFields = [] }) => {
+  
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,12 +44,31 @@ const DataTable = ({ columns, rows, actionButton = () => {}, detailPageLink, act
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  if (typeof searchQuery !== 'string') {
+    console.error('searchQuery must be a string, but got:', typeof searchQuery);
+    return [];
+  }
+  
+  if (!Array.isArray(searchableFields)) {
+    console.error('searchableFields must be an array, but got:', typeof searchableFields);
+    return [];
+  }
+  
+  // Ensure all fields in searchableFields actually exist in the rows.
+  const validSearchableFields = searchableFields.every(field => rows.some(row => field in row));
+  if (!validSearchableFields) {
+    console.error('searchableFields contains invalid field names:', searchableFields);
+    return [];
+  }
+  
+  const filteredRows = searchableFields.length > 0 ? rows.filter((row) => {
+    return searchableFields.some((field) => {
+      return row[field] && row[field].toString().toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }) : rows;
+  
+  
 
-  const filteredRows = rows.filter((row) =>
-  (row.id.toString().includes(searchQuery.toLowerCase()) ||
-  row.event_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  row.prepared_date.includes(searchQuery.toLowerCase()))
-);
 
 
 
