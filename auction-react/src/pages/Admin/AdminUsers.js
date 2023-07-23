@@ -22,7 +22,7 @@ const AdminUsers = () => {
         return;
       }
       
-      const response = await axios.patch(`http://localhost:8000/api/admin/users_update/${item.id}/Deactive`, {}, {
+      const response = await axios.patch(`http://localhost:8000/api/admin/users_update/${item.id}/deactive`, {}, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -59,7 +59,7 @@ const AdminUsers = () => {
         return;
       }
 
-      const response = await axios.patch(`http://localhost:8000/api/admin/users_update/${item.id}/Active`, {}, {
+      const response = await axios.patch(`http://localhost:8000/api/admin/users_update/${item.id}/active`, {}, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

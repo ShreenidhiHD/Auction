@@ -39,16 +39,22 @@ const UserAuctions = () => {
     }
     else{
       return   <div style={{ display: 'flex', gap: '8px' }}>
-        <Button variant="contained" size="small" component={Link} to={`/auctions/update_auction/${row.id}`}>
-          View
-        </Button>
+        {row.has_bids === 'No' ? 
+          <Button variant="contained" size="small" component={Link} to={`/auctions/update_auction/${row.id}`}>
+            Update
+          </Button>
+          : 
+          <Button variant="contained" size="small" component={Link} to={`/viewauction/${row.id}/${row.product_name}`}>
+            View
+          </Button>
+        }
         <Button variant="contained" size="small" color="primary" component={Link} to={`/auction/bids/${row.id}/${row.auction_name}`}>
          Bids
         </Button>
       </div>
-      
     }
   }
+  
   return (
     <Container sx={{ marginTop: '2rem' }}>
       <Card>

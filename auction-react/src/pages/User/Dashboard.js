@@ -54,6 +54,28 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
         </Grid>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                Auction Won
+              </Typography>
+              <Typography sx={{ mb: 2 }}>
+                View the auctions you have won.
+              </Typography>
+              <Button
+                component={Link}
+                to="/WonAuctions"
+                variant="contained"
+                fullWidth
+                sx={{ bgcolor: '#4CAF50', color: '#FFF' }}
+              >
+                View
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
       </Grid>
     </Container>
   );
