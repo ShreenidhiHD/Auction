@@ -23,7 +23,8 @@ function UpdateAuction() {
     const [loading, setLoading] = useState(true);
     const { id } = useParams();  // getting id from URL params
     const [fetchBids, setFetchBids] = useState(null);
-    
+    const [fetchedImageURL, setFetchedImageURL] = useState(null);
+
     
    
     const handleImageChange = (event) => {
@@ -45,7 +46,7 @@ function UpdateAuction() {
       
         if (response.status === 200) {
           const data = response.data.rows[0]; // Here 'data' is defined correctly
-      
+          const imageURL = `http://localhost:8000/images/${data.image}`; 
           const parsedStartDate = parse(data.start_date, 'dd-MM-yyyy', new Date());
           const formattedStartDate = format(parsedStartDate, 'yyyy-MM-dd');
       
@@ -64,6 +65,8 @@ function UpdateAuction() {
           setProductCertification(data.product_certification);
           setStatus(data.status);
           setImage(image);
+          setFetchedImageURL(imageURL);
+
           setLoading(false);
         } else {
           setLoading(false);
@@ -192,27 +195,34 @@ function UpdateAuction() {
           value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
-          <MenuItem value="Active">Active</MenuItem>
-          <MenuItem value="Deactive">Deactive</MenuItem>
+          <MenuItem value="active">Active</MenuItem>
+          <MenuItem value="deactive">Deactive</MenuItem>
         </Select>
       </FormControl>
     </Grid>
     <Grid item xs={12} sm={6}>
     <input 
-  accept="image/*" 
-  id="raised-button-file" 
-  type="file" 
-  style={{ display: 'none' }} 
-  onChange={handleImageChange} 
-/>
-<label htmlFor="raised-button-file">
-  <Button variant="raised" component="span" style={{ marginTop: '15px' }}>
-    Upload Product Image
-  </Button>
-</label>
-{image && <img src={URL.createObjectURL(image)} height="100" width="100" />}
+        accept="image/*" 
+        id="raised-button-file" 
+        type="file" 
+        style={{ display: 'none' }} 
+        onChange={handleImageChange} 
+    />
+    <label htmlFor="raised-button-file">
+        <Button variant="raised" component="span" style={{ marginTop: '15px' }}>
+            Upload Product Image
+        </Button>
+    </label>
+    {image && 
+        <React.Fragment>
+            <img src={URL.createObjectURL(image)} height="100" width="100" />
+            <Button variant="raised" component="span" style={{ marginTop: '15px' }} onClick={() => setImage(null)}>
+                Remove Image
+            </Button>
+        </React.Fragment>
+    }
+</Grid>
 
-      </Grid>
     <Grid item xs={12} container justifyContent="flex-end">
       <Button style={{ marginTop: '20px' }} variant="contained" sx={{ mr: 5, width: 200 }} color="primary" type="submit">
         Update Auction
@@ -228,7 +238,10 @@ function UpdateAuction() {
   <CardContent>
   <Typography variant="h5" component="div" align="center">Auction Preview</Typography>
     <Typography variant="body2" align="center">
-      {image ? <img src={URL.createObjectURL(image)} alt="preview" height="200" width="200"/> : "No image selected"}
+    {image ? <img src={URL.createObjectURL(image)} alt="preview" height="200" width="200"/> : 
+  fetchedImageURL ? <img src={fetchedImageURL} alt="preview" height="200" width="200"/> :
+  "No image selected"}
+
     </Typography>
    
     <Typography variant="body2">
