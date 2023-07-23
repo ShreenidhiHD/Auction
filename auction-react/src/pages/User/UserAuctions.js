@@ -39,22 +39,28 @@ const UserAuctions = () => {
     }
     else{
       return   <div style={{ display: 'flex', gap: '8px' }}>
-        <Button variant="contained" size="small" component={Link} to={`/auctions/update_auction/${row.id}`}>
-          View
-        </Button>
+        {row.has_bids === 'No' ? 
+          <Button variant="contained" size="small" component={Link} to={`/auctions/update_auction/${row.id}`}>
+            Update
+          </Button>
+          : 
+          <Button variant="contained" size="small" component={Link} to={`/viewauction/${row.id}/${row.product_name}`}>
+            View
+          </Button>
+        }
         <Button variant="contained" size="small" color="primary" component={Link} to={`/auction/bids/${row.id}/${row.auction_name}`}>
          Bids
         </Button>
       </div>
-      
     }
   }
+  
   return (
     <Container sx={{ marginTop: '2rem' }}>
       <Card>
         <CardContent>
             <h1 className='text-center'>My Auction listings</h1>
-            <DataTable columns={columns} rows={rows} actionButton={actionButton} />
+            <DataTable columns={columns} rows={rows} actionButton={actionButton} searchableFields={['created_by', 'auction_name']}/>
         </CardContent>
       </Card>
     </Container>

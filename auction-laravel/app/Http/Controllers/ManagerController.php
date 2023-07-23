@@ -115,20 +115,16 @@ class ManagerController extends Controller
         if(!$this->is_manager($user->id)){ return response()->json(['error' => 'Unauthorised access'], 401); }
 
         $auctions=AuctionModel::where('id',$auction_id)->first();
+
         if($auctions->delivery_status=='delivered'){ return response()->json(['error' => 'Product is already deliverd to bidder'], 401); }
 
         if($status=='verified' or $status=='shipped' or $status=='delivered'){
             $auction=AuctionModel::find($auction_id);
-
             $auction->delivery_status=$status;
-
             $status=$auction->save();
-
             if($status){ return response()->json(['message' => 'Auction updated successfully.'], 200); }
             else{ return response()->json(['error' => 'Unable to update auction! Try again.'], 401); }
         }
         else{ return response()->json(['error' => 'Unauthorised operation'], 401); }
     }
-   
-
 }
